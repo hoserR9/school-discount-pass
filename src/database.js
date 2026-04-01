@@ -23,6 +23,8 @@ db.exec(`
     valid_from TEXT NOT NULL DEFAULT '2026-07-31',
     valid_thru TEXT NOT NULL DEFAULT '2027-07-31',
     is_active INTEGER NOT NULL DEFAULT 1,
+    is_claimed INTEGER NOT NULL DEFAULT 0,
+    claimed_at TEXT,
     last_updated TEXT NOT NULL DEFAULT (datetime('now'))
   );
 
@@ -157,6 +159,23 @@ const deactivatePromotion = db.prepare(`
   UPDATE promotions SET is_active = 0 WHERE id = ?
 `);
 
+// ── Claim statements (physical card → digital wallet) ──
+const claimCard = db.prepare(`
+  UPDATE cards SET is_claimed = 1, claimed_at = datetime('now'), holder_name = ? WHERE card_id = ?
+`);
+
+const getUnclaimedCards = db.prepare(`
+  SELECT * FROM cards WHERE is_claimed = 0 AND is_active = 1 ORDER BY issued_at ASC
+`);
+
+const getClaimStats = db.prepare(`
+  SELECT
+    COUNT(*) as total_cards,
+    SUM(CASE WHEN is_claimed = 1 THEN 1 ELSE 0 END) as claimed,
+    SUM(CASE WHEN is_claimed = 0 THEN 1 ELSE 0 END) as unclaimed
+  FROM cards WHERE is_active = 1
+`);
+
 module.exports = {
   db,
   // Cards
@@ -182,4 +201,8 @@ module.exports = {
   getActivePromotions,
   getAllPromotions,
   deactivatePromotion,
+  // Claims
+  claimCard,
+  getUnclaimedCards,
+  getClaimStats,
 };

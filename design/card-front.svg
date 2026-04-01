@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1050" height="600" viewBox="0 0 1050 600">
+  <!-- Standard business card ratio 3.5" x 2" at 300dpi -->
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#D4B96A"/>
+      <stop offset="50%" style="stop-color:#C5A55A"/>
+      <stop offset="100%" style="stop-color:#B89840"/>
+    </linearGradient>
+    <clipPath id="roundedCard">
+      <rect x="0" y="0" width="1050" height="600" rx="24" ry="24"/>
+    </clipPath>
+  </defs>
+
+  <!-- Card background -->
+  <rect width="1050" height="600" rx="24" ry="24" fill="url(#goldGrad)"/>
+
+  <!-- "DEL NORTE" text - top left, vertical orientation simulated with rotation -->
+  <text x="60" y="100" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="42" fill="#002D62" letter-spacing="4" transform="rotate(90, 60, 100)">DEL NORTE</text>
+
+  <!-- "NIGHTHAWK" - large prominent text -->
+  <text x="180" y="200" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="72" fill="#002D62">NIGHTHAWK</text>
+
+  <!-- "DISCOUNT CARD" -->
+  <text x="180" y="250" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="36" fill="#002D62">DISCOUNT CARD</text>
+
+  <!-- Logo circle placeholder -->
+  <circle cx="400" cy="400" r="110" fill="white" stroke="#002D62" stroke-width="6"/>
+  <!-- DN text inside circle -->
+  <text x="400" y="385" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="80" fill="#002D62" text-anchor="middle" dominant-baseline="middle">D</text>
+  <text x="400" y="385" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="80" fill="#002D62" text-anchor="middle" dominant-baseline="middle" dx="20">N</text>
+  <!-- Placeholder note for logo -->
+  <text x="400" y="440" font-family="Arial, sans-serif" font-size="12" fill="#002D62" text-anchor="middle" opacity="0.5">(Replace with Nighthawk logo)</text>
+
+  <!-- $20 price -->
+  <text x="950" y="560" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="40" fill="#002D62" text-anchor="end">$20</text>
+
+  <!-- Valid thru - right side, vertical -->
+  <text x="990" y="80" font-family="Arial, sans-serif" font-weight="700" font-size="18" fill="#002D62" transform="rotate(90, 990, 80)" letter-spacing="1">VALID THRU 7/31/2027</text>
+</svg>

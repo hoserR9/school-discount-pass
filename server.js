@@ -19,6 +19,9 @@ const {
   getActivePromotions,
   getAllPromotions,
   deactivatePromotion,
+  claimCard,
+  getUnclaimedCards,
+  getClaimStats,
 } = require("./src/database");
 const { pushUpdateToAll } = require("./src/push-update");
 
@@ -51,7 +54,81 @@ app.get("/pass", async (req, res) => {
 });
 
 // ═══════════════════════════════════════════════
-//  QR CODE SCAN ENDPOINT
+//  SMART CARD ENDPOINT (physical QR → dual purpose)
+//  - iPhone user → claim page with "Add to Wallet"
+//  - Business POS → verification + logs scan
+// ═══════════════════════════════════════════════
+
+app.get("/card/:cardId", (req, res) => {
+  const { cardId } = req.params;
+  const card = getCard.get(cardId);
+
+  if (!card) {
+    return res.status(404).send(renderScanPage(null, cardId));
+  }
+
+  // Detect if this is likely a customer (mobile browser) vs a business (POS/desktop)
+  const ua = (req.get("user-agent") || "").toLowerCase();
+  const isMobile = /iphone|ipad|android|mobile/i.test(ua);
+
+  if (isMobile && !card.is_claimed) {
+    // First-time scan on mobile → show claim page with "Add to Apple Wallet"
+    console.log(`[CLAIM PAGE] Card ${cardId} — showing claim page`);
+    return res.send(renderClaimPage(card, cardId));
+  }
+
+  if (isMobile && card.is_claimed) {
+    // Already claimed on mobile → show card details + re-download option
+    console.log(`[CARD VIEW] Card ${cardId} — already claimed, showing details`);
+    return res.send(renderClaimPage(card, cardId, true));
+  }
+
+  // Business scan → log it and show verification
+  const businessName = req.query.biz || null;
+  logScan.run(cardId, businessName, req.ip, req.get("user-agent") || "");
+  const scans = getScansForCard.all(cardId);
+  console.log(`[SCAN] Card ${cardId} scanned at POS (total: ${scans.length})`);
+  res.send(renderScanPage(card, cardId, scans));
+});
+
+// Claim endpoint — when user taps "Add to Wallet" from the claim page
+app.get("/card/:cardId/claim", async (req, res) => {
+  const { cardId } = req.params;
+  const holderName = req.query.name || null;
+  const card = getCard.get(cardId);
+
+  if (!card) {
+    return res.status(404).json({ error: "Card not found" });
+  }
+
+  // Mark as claimed
+  if (!card.is_claimed) {
+    claimCard.run(holderName, cardId);
+    console.log(`[CLAIMED] Card ${cardId} claimed${holderName ? ` by ${holderName}` : ""}`);
+  }
+
+  // Generate the .pkpass tied to this specific card
+  try {
+    const { buffer } = await generatePass({
+      existingCardId: card.card_id,
+      existingSerialNumber: card.serial_number,
+      existingAuthToken: card.auth_token,
+      holderName: holderName || card.holder_name,
+    });
+
+    res.set({
+      "Content-Type": "application/vnd.apple.pkpass",
+      "Content-Disposition": 'attachment; filename="del-norte-nighthawk-discount.pkpass"',
+    });
+    res.send(buffer);
+  } catch (err) {
+    console.error("Error generating pass for claim:", err);
+    res.status(500).json({ error: "Failed to generate pass" });
+  }
+});
+
+// ═══════════════════════════════════════════════
+//  QR CODE SCAN ENDPOINT (legacy, still works)
 // ═══════════════════════════════════════════════
 
 app.get("/scan/:cardId", (req, res) => {
@@ -311,11 +388,14 @@ app.get("/api/stats", (req, res) => {
   const stats = getUsageStats.all();
   const cards = getAllCards.all();
   const regCount = getRegistrationCount.get();
+  const claimStatsRow = getClaimStats.get();
   res.json({
     totalCards: cards.length,
     activeCards: cards.filter((c) => c.is_active).length,
     totalScans: cards.reduce((sum, c) => sum + c.scan_count, 0),
     registeredDevices: regCount ? regCount.count : 0,
+    claimedCards: claimStatsRow ? claimStatsRow.claimed : 0,
+    unclaimedCards: claimStatsRow ? claimStatsRow.unclaimed : 0,
     byBusiness: stats,
   });
 });
@@ -379,6 +459,84 @@ function renderScanPage(card, cardId, scans = []) {
       <div class="scan-count">This card has been scanned <strong>${scans.length}</strong> time${scans.length !== 1 ? "s" : ""}</div>
       ${promoHtml}
     </div>
+  </body></html>`;
+}
+
+// ═══════════════════════════════════════════════
+//  CLAIM PAGE HTML (mobile users scan physical card QR)
+// ═══════════════════════════════════════════════
+
+function renderClaimPage(card, cardId, alreadyClaimed = false) {
+  const promos = getActivePromotions.all();
+  const promoHtml = promos.length > 0
+    ? promos.map(p => `<div class="promo">${p.title}: ${p.message}</div>`).join("")
+    : "";
+
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Del Norte Nighthawk Discount Card</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,sans-serif;background:#002D62;color:#002D62;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
+    .card{background:linear-gradient(135deg,#d4b96a,#C5A55A,#b89840);border-radius:16px;padding:30px 24px;max-width:360px;width:100%;text-align:center;margin-top:20px;box-shadow:0 8px 32px rgba(0,0,0,0.4)}
+    .card h1{font-size:18px;letter-spacing:3px;margin-bottom:2px}
+    .card h2{font-size:28px;font-weight:900;margin-bottom:2px}
+    .card h3{font-size:16px;margin-bottom:16px}
+    .card-id{font-family:monospace;font-size:13px;background:rgba(0,45,98,0.15);padding:6px 12px;border-radius:6px;display:inline-block;margin:8px 0;letter-spacing:2px}
+    .form-group{text-align:left;margin:16px 0}
+    .form-group label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+    .form-group input{width:100%;padding:10px 14px;border:1px solid #002D62;border-radius:8px;background:rgba(255,255,255,0.6);font-size:16px;color:#002D62;outline:none}
+    .wallet-btn{display:inline-block;margin-top:16px;background:#000;color:#fff;font-size:16px;font-weight:600;padding:14px 28px;border-radius:12px;text-decoration:none;border:none;cursor:pointer}
+    .wallet-btn:hover{background:#222}
+    .info{margin-top:16px;font-size:12px;color:#C5A55A;max-width:360px;text-align:center;line-height:1.5}
+    .already{background:rgba(26,122,26,0.15);color:#1a7a1a;padding:8px 16px;border-radius:8px;margin:12px 0;font-size:13px;font-weight:600}
+    .promo{background:rgba(0,45,98,0.1);padding:8px 12px;border-radius:6px;margin:6px 0;font-size:12px;text-align:left}
+    .promos-section{margin-top:12px}
+    .promos-section h4{font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+  </style></head>
+  <body>
+    <div class="card">
+      <h1>DEL NORTE</h1>
+      <h2>NIGHTHAWK</h2>
+      <h3>DISCOUNT CARD</h3>
+
+      <div class="card-id">${cardId}</div>
+
+      ${alreadyClaimed
+        ? '<div class="already">This card has been added to a Wallet. Tap below to re-download.</div>'
+        : '<p style="font-size:13px;margin:8px 0">Scan successful! Add this card to your Apple Wallet.</p>'
+      }
+
+      ${!alreadyClaimed ? `
+      <div class="form-group">
+        <label>Your Name (optional)</label>
+        <input type="text" id="name" placeholder="e.g. John Doe">
+      </div>
+      ` : ''}
+
+      <a id="walletLink" href="/card/${cardId}/claim" class="wallet-btn">
+        ${alreadyClaimed ? 'Re-download to Wallet' : 'Add to Apple Wallet'}
+      </a>
+
+      ${promoHtml ? `<div class="promos-section"><h4>Current Deals</h4>${promoHtml}</div>` : ''}
+    </div>
+
+    <p class="info">
+      Card must be presented for discount. Not good with any other offer.<br>
+      Show this card or have the QR code scanned at checkout.
+    </p>
+
+    ${!alreadyClaimed ? `
+    <script>
+      const nameInput = document.getElementById('name');
+      const walletLink = document.getElementById('walletLink');
+      if (nameInput) {
+        nameInput.addEventListener('input', () => {
+          const name = nameInput.value.trim();
+          walletLink.href = name ? '/card/${cardId}/claim?name=' + encodeURIComponent(name) : '/card/${cardId}/claim';
+        });
+      }
+    </script>
+    ` : ''}
   </body></html>`;
 }
 
