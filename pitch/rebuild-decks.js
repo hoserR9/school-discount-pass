@@ -60,8 +60,8 @@ async function buildSponsorDeck() {
   const sponsorDash = await imgToBase64(path.join(IMG_DIR, "sponsor-dashboard-mockup.png"));
   const claimMockup = await imgToBase64(path.join(IMG_DIR, "claim-page-mockup.png"));
   const qrCode = await imgToBase64(path.join(IMG_DIR, "sample-qr-code.png"));
-  const dnLogo = await imgToBase64(path.join(DESIGN_DIR, "dn-logo-full.jpeg"));
-  const dnLogoText = await imgToBase64(path.join(DESIGN_DIR, "dn-logo-192.png"));
+  const dnLogo = await imgToBase64(path.join(DESIGN_DIR, "DNFOOTBALL_LOGO.png"));
+  const dnLogoHead = await imgToBase64(path.join(DESIGN_DIR, "dn-logo-full.jpeg"));
 
   // ═══════ SLIDE 1: TITLE ═══════
   {
@@ -362,7 +362,7 @@ async function buildBoardDeck() {
   const fraudMockup = await imgToBase64(path.join(IMG_DIR, "fraud-warning-mockup.png"));
   const sponsorDash = await imgToBase64(path.join(IMG_DIR, "sponsor-dashboard-mockup.png"));
   const qrCode = await imgToBase64(path.join(IMG_DIR, "sample-qr-code.png"));
-  const dnLogo = await imgToBase64(path.join(DESIGN_DIR, "dn-logo-full.jpeg"));
+  const dnLogo = await imgToBase64(path.join(DESIGN_DIR, "DNFOOTBALL_LOGO.png"));
 
   // ═══════ SLIDE 1: TITLE ═══════
   {
