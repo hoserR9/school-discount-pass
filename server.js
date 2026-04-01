@@ -22,6 +22,9 @@ const {
   claimCard,
   getUnclaimedCards,
   getClaimStats,
+  getSponsorByCode,
+  getScansForBusiness,
+  getStatsForBusiness,
 } = require("./src/database");
 const { pushUpdateToAll } = require("./src/push-update");
 
@@ -424,14 +427,44 @@ function renderScanPage(card, cardId, scans = []) {
   const isExpired = now > validThru;
   const isValid = isActive && !isExpired;
 
-  const statusColor = isValid ? "#1a7a1a" : "#cc0000";
-  const statusText = !isActive ? "DEACTIVATED" : isExpired ? "EXPIRED" : "VALID";
-  const statusEmoji = isValid ? "&#10003;" : "&#10007;";
+  // ── Fraud detection ──
+  const warnings = [];
+  const MAX_SCANS_PER_DAY = 5;
 
-  // Show active promotions on the scan page too
+  // Check scans in the last 24 hours
+  const oneDayAgo = new Date(now - 24 * 60 * 60 * 1000).toISOString();
+  const recentScans = scans.filter(s => s.scanned_at > oneDayAgo);
+  if (recentScans.length >= MAX_SCANS_PER_DAY) {
+    warnings.push(`Used ${recentScans.length} times in 24hrs — possible sharing`);
+  }
+
+  // Check last scan time — if scanned very recently, flag it
+  if (scans.length > 0) {
+    const lastScan = new Date(scans[0].scanned_at);
+    const minutesSinceLast = (now - lastScan) / 60000;
+    if (minutesSinceLast < 5 && scans[0].business_name) {
+      warnings.push(`Just scanned ${Math.round(minutesSinceLast)}min ago at ${scans[0].business_name}`);
+    }
+  }
+
+  const hasWarning = warnings.length > 0;
+  const statusColor = !isValid ? "#cc0000" : hasWarning ? "#cc8800" : "#1a7a1a";
+  const statusText = !isActive ? "DEACTIVATED" : isExpired ? "EXPIRED" : hasWarning ? "VALID — CHECK ID" : "VALID";
+  const statusEmoji = !isValid ? "&#10007;" : hasWarning ? "&#9888;" : "&#10003;";
+
+  const warningHtml = hasWarning
+    ? `<div class="warning">${warnings.map(w => `<div>&#9888; ${w}</div>`).join("")}</div>`
+    : "";
+
+  // Show active promotions
   const promos = getActivePromotions.all();
   const promoHtml = promos.length > 0
     ? `<div class="scan-count" style="margin-top:12px"><strong>Current Promotions:</strong><br>${promos.map(p => `${p.title}: ${p.message}`).join("<br>")}</div>`
+    : "";
+
+  // Last scan info for the cashier
+  const lastScanHtml = scans.length > 0
+    ? `<div class="detail"><span class="label">Last Scan</span><span>${scans[0].scanned_at}${scans[0].business_name ? ' at ' + scans[0].business_name : ''}</span></div>`
     : "";
 
   return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -446,17 +479,25 @@ function renderScanPage(card, cardId, scans = []) {
     .detail:last-child{border-bottom:none}
     .label{opacity:0.7}
     .scan-count{background:rgba(255,255,255,0.2);border-radius:8px;padding:12px;margin-top:16px;font-size:13px}
+    .holder-name{font-size:22px;font-weight:700;background:rgba(255,255,255,0.15);padding:10px 16px;border-radius:8px;margin:8px 0 16px;letter-spacing:1px}
+    .warning{background:rgba(0,0,0,0.3);border:2px solid #fff;border-radius:8px;padding:10px;margin:12px 0;font-size:13px;font-weight:600;text-align:left}
+    .warning div{padding:3px 0}
+    .cashier-tip{font-size:11px;opacity:0.7;margin-top:12px;font-style:italic}
   </style></head>
   <body>
     <div class="card">
       <div class="status">${statusEmoji}</div>
       <h1>DEL NORTE NIGHTHAWK</h1>
       <h2>Discount Card — ${statusText}</h2>
+      ${card.holder_name ? `<div class="holder-name">${card.holder_name}</div>` : ''}
+      ${warningHtml}
       <div class="detail"><span class="label">Card ID</span><span>${cardId}</span></div>
-      <div class="detail"><span class="label">Holder</span><span>${card.holder_name || "General"}</span></div>
-      <div class="detail"><span class="label">Issued</span><span>${card.issued_at}</span></div>
+      ${!card.holder_name ? '<div class="detail"><span class="label">Holder</span><span>General</span></div>' : ''}
       <div class="detail"><span class="label">Valid Thru</span><span>${card.valid_thru}</span></div>
-      <div class="scan-count">This card has been scanned <strong>${scans.length}</strong> time${scans.length !== 1 ? "s" : ""}</div>
+      <div class="detail"><span class="label">Total Scans</span><span>${scans.length}</span></div>
+      <div class="detail"><span class="label">Today</span><span>${recentScans.length} scans</span></div>
+      ${lastScanHtml}
+      ${card.holder_name ? '<div class="cashier-tip">Tip: Ask the customer to confirm their name matches above</div>' : ''}
       ${promoHtml}
     </div>
   </body></html>`;
@@ -540,9 +581,55 @@ function renderClaimPage(card, cardId, alreadyClaimed = false) {
   </body></html>`;
 }
 
+// ═══════════════════════════════════════════════
+//  SPONSOR PORTAL — each business sees their own data
+//  Login with their unique access code (no passwords)
+// ═══════════════════════════════════════════════
+
+app.get("/sponsor", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "sponsor.html"));
+});
+
+app.post("/api/sponsor/login", (req, res) => {
+  const { code } = req.body;
+  if (!code) return res.status(400).json({ error: "Access code required" });
+
+  const sponsor = getSponsorByCode.get(code.trim().toUpperCase());
+  if (!sponsor) return res.status(401).json({ error: "Invalid access code" });
+
+  const stats = getStatsForBusiness.get(sponsor.business_name) || {};
+  const recentScans = getScansForBusiness.all(sponsor.business_name);
+
+  // Group scans by day for a simple chart
+  const scansByDay = {};
+  recentScans.forEach(s => {
+    const day = s.scanned_at.split(" ")[0]; // YYYY-MM-DD
+    scansByDay[day] = (scansByDay[day] || 0) + 1;
+  });
+
+  res.json({
+    business: sponsor.business_name,
+    tier: sponsor.tier,
+    discount: sponsor.discount_text,
+    stats: {
+      totalScans: stats.total_scans || 0,
+      uniqueCustomers: stats.unique_customers || 0,
+      lastScan: stats.last_scan || "No scans yet",
+      firstScan: stats.first_scan || "N/A",
+    },
+    recentScans: recentScans.slice(0, 50).map(s => ({
+      date: s.scanned_at,
+      cardId: s.card_id,
+      holder: s.holder_name || "General",
+    })),
+    scansByDay,
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Del Norte Nighthawk Discount Pass server running at http://localhost:${PORT}`);
   console.log(`Download a pass:  http://localhost:${PORT}/pass`);
   console.log(`Admin dashboard:  http://localhost:${PORT}/admin`);
+  console.log(`Sponsor portal:   http://localhost:${PORT}/sponsor`);
   console.log(`\nApple Wallet web service endpoints active at /v1/...`);
 });

@@ -176,6 +176,55 @@ const getClaimStats = db.prepare(`
   FROM cards WHERE is_active = 1
 `);
 
+// ── Sponsor portal statements ──
+db.exec(`
+  CREATE TABLE IF NOT EXISTS sponsors (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    business_name TEXT NOT NULL UNIQUE,
+    access_code TEXT NOT NULL,
+    contact_name TEXT,
+    contact_email TEXT,
+    discount_text TEXT,
+    tier TEXT DEFAULT 'bronze',
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+`);
+
+const createSponsor = db.prepare(`
+  INSERT OR IGNORE INTO sponsors (business_name, access_code, contact_name, contact_email, discount_text, tier)
+  VALUES (?, ?, ?, ?, ?, ?)
+`);
+
+const getSponsorByCode = db.prepare(`
+  SELECT * FROM sponsors WHERE access_code = ?
+`);
+
+const getSponsorByName = db.prepare(`
+  SELECT * FROM sponsors WHERE business_name = ?
+`);
+
+const getAllSponsors = db.prepare(`
+  SELECT * FROM sponsors ORDER BY business_name ASC
+`);
+
+const getScansForBusiness = db.prepare(`
+  SELECT s.*, c.holder_name, c.card_id
+  FROM scans s
+  JOIN cards c ON s.card_id = c.card_id
+  WHERE s.business_name = ?
+  ORDER BY s.scanned_at DESC
+`);
+
+const getStatsForBusiness = db.prepare(`
+  SELECT
+    COUNT(*) as total_scans,
+    COUNT(DISTINCT s.card_id) as unique_customers,
+    MAX(s.scanned_at) as last_scan,
+    MIN(s.scanned_at) as first_scan
+  FROM scans s
+  WHERE s.business_name = ?
+`);
+
 module.exports = {
   db,
   // Cards
@@ -205,4 +254,11 @@ module.exports = {
   claimCard,
   getUnclaimedCards,
   getClaimStats,
+  // Sponsors
+  createSponsor,
+  getSponsorByCode,
+  getSponsorByName,
+  getAllSponsors,
+  getScansForBusiness,
+  getStatsForBusiness,
 };
