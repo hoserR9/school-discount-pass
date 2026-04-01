@@ -416,7 +416,7 @@ async function main() {
     const sponsors = [
       "Baskin Robbins", "Harland Brewing", "Board & Brew",
       "L&L Hawaiian Barbecue", "Kahoots", "Mostra Coffee",
-      "Rosinas", "Donut Touch", "Sushi Ken",
+      "Rosinas", "Donut Touch", "Sushi Ren",
       "Flippin Pizza", "Round Table Pizza",
     ];
 

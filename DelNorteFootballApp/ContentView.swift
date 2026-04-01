@@ -197,7 +197,7 @@ struct ContentView: View {
             ("Mostra Coffee", "10% off"),
             ("Rosinas", "10% off"),
             ("Donut Touch", "10% off"),
-            ("Sushi Ken", "20% off"),
+            ("Sushi Ren", "20% off"),
             ("Flippin Pizza", "$5 off over $15"),
             ("Round Table Pizza", "10% off (RB)"),
         ]

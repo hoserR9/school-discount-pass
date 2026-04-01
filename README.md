@@ -226,7 +226,7 @@ APNS_USE_SANDBOX=true        # set to false for production
 - Mostra Coffee — 10% off
 - Rosinas — 10% off
 - Donut Touch — 10% off
-- Sushi Ken — 20% off, dine-in/carry out
+- Sushi Ren — 20% off, dine-in/carry out
 - Flippin Pizza — $5 off orders over $15, 1 per customer
 - Round Table Pizza (Rancho Bernardo) — 10% off
 

@@ -179,7 +179,7 @@ async function renderFraudWarning() {
     <!-- Warning box -->
     <rect x="40" y="195" width="${w-80}" height="65" rx="8" fill="rgba(0,0,0,0.3)" stroke="white" stroke-width="2"/>
     <text x="55" y="218" font-family="Arial" font-weight="600" font-size="12" fill="white">&#9888; Used 6 times in 24hrs — possible sharing</text>
-    <text x="55" y="240" font-family="Arial" font-weight="600" font-size="12" fill="white">&#9888; Just scanned 3min ago at Sushi Ken</text>
+    <text x="55" y="240" font-family="Arial" font-weight="600" font-size="12" fill="white">&#9888; Just scanned 3min ago at Sushi Ren</text>
 
     <!-- Details -->
     <text x="50" y="290" font-family="Arial" font-size="12" fill="white" opacity="0.7">Card ID</text>

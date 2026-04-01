@@ -83,7 +83,7 @@ Del Norte High School Football — 2026-2027 Season
 - Mostra Coffee
 - Rosinas
 - Donut Touch
-- Sushi Ken
+- Sushi Ren
 - Flippin Pizza
 - Round Table Pizza (Rancho Bernardo)
 

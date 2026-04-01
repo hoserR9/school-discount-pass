@@ -260,7 +260,7 @@ async function buildSponsorDeck() {
     s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 10, h: 1.1, fill: { color: NAVY } });
     s.addText("CURRENT SPONSORS (2026-2027)", { x: 0.8, y: 0.25, w: 8, h: 0.6, fontSize: 28, fontFace: "Arial Black", bold: true, color: GOLD, margin: 0 });
 
-    const sponsors = ["Baskin Robbins", "Harland Brewing", "Board & Brew", "L&L Hawaiian Barbecue", "Kahoots", "Mostra Coffee", "Rosinas", "Donut Touch", "Sushi Ken", "Flippin Pizza", "Round Table Pizza"];
+    const sponsors = ["Baskin Robbins", "Harland Brewing", "Board & Brew", "L&L Hawaiian Barbecue", "Kahoots", "Mostra Coffee", "Rosinas", "Donut Touch", "Sushi Ren", "Flippin Pizza", "Round Table Pizza"];
     sponsors.forEach((sp, i) => {
       const col = i % 3, row = Math.floor(i / 3);
       const x = 0.8 + col * 3.0, y = 1.4 + row * 0.9;

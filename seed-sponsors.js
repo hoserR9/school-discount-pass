@@ -24,7 +24,7 @@ const sponsors = [
   { name: "Mostra Coffee", discount: "10% off", tier: "gold" },
   { name: "Rosinas", discount: "10% off", tier: "silver" },
   { name: "Donut Touch", discount: "10% off", tier: "bronze" },
-  { name: "Sushi Ken", discount: "20% off, dine-in/carry out", tier: "silver" },
+  { name: "Sushi Ren", discount: "20% off, dine-in/carry out", tier: "silver" },
   { name: "Flippin Pizza", discount: "$5 off orders over $15", tier: "silver" },
   { name: "Round Table Pizza", discount: "10% off (Rancho Bernardo)", tier: "bronze" },
 ];
