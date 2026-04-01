@@ -116,9 +116,21 @@ Del Norte High School Football — 2026-2027 Season
 
 ---
 
-### Slide 12: Contact
+### Slide 12: Your Own Dashboard
+Each sponsor gets a **private login** to view their analytics:
+- Total visits from cardholders
+- Unique customers
+- Visits by day
+- Recent scan history
+No app needed — works on any phone or computer with a simple access code.
+
+---
+
+### Slide 13: Contact
 **Del Norte High School Football**
 Nighthawk Discount Card Program
 [Contact info here]
 
 "Support student athletes. Drive customers to your door."
+
+All sponsorships subject to the Nighthawk Discount Card Sponsor Agreement. Terms & Conditions and Privacy Policy available at the Program website.
