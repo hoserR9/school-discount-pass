@@ -30,8 +30,10 @@ async function iconPng(Icon, color, size = 256) {
   return "image/png;base64," + buf.toString("base64");
 }
 async function imgToBase64(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
   const buf = fs.readFileSync(filePath);
-  return "image/png;base64," + buf.toString("base64");
+  const mime = ext === ".jpg" || ext === ".jpeg" ? "image/jpeg" : "image/png";
+  return `${mime};base64,` + buf.toString("base64");
 }
 const makeShadow = () => ({ type: "outer", blur: 8, offset: 3, angle: 135, color: "000000", opacity: 0.2 });
 
@@ -58,13 +60,16 @@ async function buildSponsorDeck() {
   const sponsorDash = await imgToBase64(path.join(IMG_DIR, "sponsor-dashboard-mockup.png"));
   const claimMockup = await imgToBase64(path.join(IMG_DIR, "claim-page-mockup.png"));
   const qrCode = await imgToBase64(path.join(IMG_DIR, "sample-qr-code.png"));
+  const dnLogo = await imgToBase64(path.join(DESIGN_DIR, "dn-logo-full.jpeg"));
+  const dnLogoText = await imgToBase64(path.join(DESIGN_DIR, "dn-logo-192.png"));
 
   // ═══════ SLIDE 1: TITLE ═══════
   {
     const s = pres.addSlide();
     s.background = { color: DARK_NAVY };
     s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 10, h: 0.06, fill: { color: GOLD } });
-    s.addImage({ data: icons.football, x: 8.5, y: 0.6, w: 1, h: 1 });
+    // Nighthawk logo top right
+    s.addImage({ data: dnLogo, x: 7.5, y: 0.3, w: 2.2, h: 1.3, sizing: { type: "contain", w: 2.2, h: 1.3 } });
     s.addText("DEL NORTE", { x: 0.8, y: 1.0, w: 8, h: 0.8, fontSize: 20, fontFace: "Arial", color: GOLD, charSpacing: 8, margin: 0 });
     s.addText("NIGHTHAWK", { x: 0.8, y: 1.6, w: 8, h: 1.0, fontSize: 44, fontFace: "Arial Black", bold: true, color: WHITE, margin: 0 });
     s.addText("Digital Discount Card", { x: 0.8, y: 2.5, w: 8, h: 0.6, fontSize: 24, fontFace: "Arial", color: GOLD, margin: 0 });
@@ -315,7 +320,7 @@ async function buildSponsorDeck() {
     const s = pres.addSlide();
     s.background = { color: DARK_NAVY };
     s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 10, h: 0.06, fill: { color: GOLD } });
-    s.addImage({ data: icons.football, x: 4.4, y: 0.8, w: 1.2, h: 1.2 });
+    s.addImage({ data: dnLogo, x: 3.5, y: 0.4, w: 3.0, h: 1.8, sizing: { type: "contain", w: 3.0, h: 1.8 } });
     s.addText("DEL NORTE HIGH SCHOOL FOOTBALL", { x: 0.8, y: 2.2, w: 8.4, h: 0.6, fontSize: 20, fontFace: "Arial Black", bold: true, color: WHITE, align: "center", margin: 0 });
     s.addText("Nighthawk Discount Card Program", { x: 0.8, y: 2.7, w: 8.4, h: 0.5, fontSize: 16, fontFace: "Arial", color: GOLD, align: "center", margin: 0 });
     s.addShape(pres.shapes.RECTANGLE, { x: 3.5, y: 3.4, w: 3.0, h: 0.04, fill: { color: GOLD } });
@@ -357,13 +362,14 @@ async function buildBoardDeck() {
   const fraudMockup = await imgToBase64(path.join(IMG_DIR, "fraud-warning-mockup.png"));
   const sponsorDash = await imgToBase64(path.join(IMG_DIR, "sponsor-dashboard-mockup.png"));
   const qrCode = await imgToBase64(path.join(IMG_DIR, "sample-qr-code.png"));
+  const dnLogo = await imgToBase64(path.join(DESIGN_DIR, "dn-logo-full.jpeg"));
 
   // ═══════ SLIDE 1: TITLE ═══════
   {
     const s = pres.addSlide();
     s.background = { color: DARK_NAVY };
     s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 10, h: 0.06, fill: { color: GOLD } });
-    s.addImage({ data: icons.football, x: 8.5, y: 0.5, w: 0.9, h: 0.9 });
+    s.addImage({ data: dnLogo, x: 7.5, y: 0.3, w: 2.2, h: 1.3, sizing: { type: "contain", w: 2.2, h: 1.3 } });
     s.addText("MODERNIZING THE", { x: 0.8, y: 1.2, w: 8, h: 0.5, fontSize: 16, fontFace: "Arial", color: GOLD, charSpacing: 4, margin: 0 });
     s.addText("NIGHTHAWK\nDISCOUNT CARD", { x: 0.8, y: 1.7, w: 8, h: 1.6, fontSize: 42, fontFace: "Arial Black", bold: true, color: WHITE, margin: 0 });
     s.addShape(pres.shapes.RECTANGLE, { x: 0.8, y: 3.5, w: 2.5, h: 0.04, fill: { color: GOLD } });
@@ -490,7 +496,7 @@ async function buildBoardDeck() {
     const s = pres.addSlide();
     s.background = { color: DARK_NAVY };
     s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 10, h: 0.06, fill: { color: GOLD } });
-    s.addImage({ data: icons.football, x: 4.4, y: 0.8, w: 1.2, h: 1.2 });
+    s.addImage({ data: dnLogo, x: 3.5, y: 0.4, w: 3.0, h: 1.8, sizing: { type: "contain", w: 3.0, h: 1.8 } });
     s.addText("REQUESTING BOARD APPROVAL", { x: 0.8, y: 2.2, w: 8.4, h: 0.6, fontSize: 22, fontFace: "Arial Black", bold: true, color: GOLD, align: "center", margin: 0 });
     s.addShape(pres.shapes.RECTANGLE, { x: 3.5, y: 2.9, w: 3.0, h: 0.04, fill: { color: GOLD } });
     s.addText("Same fundraiser. Better experience.\nMore data. Lower cost.", { x: 0.8, y: 3.2, w: 8.4, h: 0.8, fontSize: 18, fontFace: "Arial", italic: true, color: WHITE, align: "center", margin: 0 });
