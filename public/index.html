@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Del Norte Nighthawk Discount Card</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #002D62;
+      color: #002D62;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: linear-gradient(135deg, #d4b96a 0%, #C5A55A 50%, #b89840 100%);
+      border-radius: 16px;
+      padding: 40px 30px;
+      max-width: 380px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      position: relative;
+    }
+    .card h1 {
+      font-size: 22px;
+      letter-spacing: 3px;
+      margin-bottom: 4px;
+      font-weight: 800;
+    }
+    .card h2 {
+      font-size: 28px;
+      font-weight: 900;
+      margin-bottom: 2px;
+      letter-spacing: 1px;
+    }
+    .card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .logo-placeholder {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: #fff;
+      margin: 16px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      font-weight: 900;
+      color: #002D62;
+      border: 3px solid #002D62;
+    }
+    .card-value {
+      position: absolute;
+      bottom: 16px;
+      right: 20px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .valid-thru {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      writing-mode: vertical-rl;
+      letter-spacing: 1px;
+    }
+    .wallet-btn {
+      display: inline-block;
+      margin-top: 24px;
+      background: #000;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      padding: 14px 28px;
+      border-radius: 12px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .wallet-btn:hover { background: #222; }
+    .info {
+      margin-top: 24px;
+      font-size: 13px;
+      color: #C5A55A;
+      max-width: 380px;
+      line-height: 1.6;
+    }
+    .businesses {
+      margin-top: 20px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 380px;
+      width: 100%;
+      text-align: left;
+    }
+    .businesses h4 {
+      color: #C5A55A;
+      font-size: 14px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .businesses ul {
+      list-style: none;
+      padding: 0;
+    }
+    .businesses li {
+      color: #ddd;
+      font-size: 13px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .businesses li:last-child { border-bottom: none; }
+    .businesses li strong { color: #C5A55A; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>DEL NORTE</h1>
+    <h2>NIGHTHAWK</h2>
+    <h3>DISCOUNT CARD</h3>
+    <div class="logo-placeholder">DN</div>
+    <div class="card-value">$20</div>
+    <div class="valid-thru">VALID THRU 7/31/2027</div>
+  </div>
+
+  <a href="/pass" class="wallet-btn">Add to Apple Wallet</a>
+
+  <p class="info">
+    Card must be presented for discount. Not good with any other offer.
+    Show this card or have the QR code scanned at checkout.
+  </p>
+
+  <div class="businesses">
+    <h4>Participating Businesses</h4>
+    <ul>
+      <li><strong>Baskin Robbins</strong> — BOGO 50% off scoops</li>
+      <li><strong>Harland Brewing</strong> — 10% off</li>
+      <li><strong>Board & Brew</strong> — 10% off</li>
+      <li><strong>L&L Hawaiian Barbecue</strong> — 10% off</li>
+      <li><strong>Kahoots</strong> — 20% off treats & bones</li>
+      <li><strong>Mostra Coffee</strong> — 10% off</li>
+      <li><strong>Rosinas</strong> — 10% off</li>
+      <li><strong>Donut Touch</strong> — 10% off</li>
+      <li><strong>Sushi Ken</strong> — 20% off, dine-in/carry out</li>
+      <li><strong>Flippin Pizza</strong> — $5 off orders over $15</li>
+      <li><strong>Round Table Pizza</strong> — 10% off (Rancho Bernardo)</li>
+    </ul>
+  </div>
+</body>
+</html>

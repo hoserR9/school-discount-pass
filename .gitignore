@@ -1,0 +1,8 @@
+node_modules/
+data/
+*.pkpass
+.DS_Store
+
+# Certificates — NEVER commit real certs to git
+# The placeholder self-signed certs are fine for development
+# certs/

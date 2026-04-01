@@ -1,0 +1,56 @@
+{
+  "formatVersion": 1,
+  "passTypeIdentifier": "pass.com.delnorte.football.discount",
+  "teamIdentifier": "PLACEHOLDER",
+  "organizationName": "Del Norte HS Football",
+  "description": "Del Norte Nighthawk Discount Card",
+  "backgroundColor": "rgb(197, 165, 90)",
+  "foregroundColor": "rgb(0, 45, 98)",
+  "labelColor": "rgb(0, 45, 98)",
+  "logoText": "DEL NORTE",
+  "generic": {
+    "primaryFields": [
+      {
+        "key": "cardType",
+        "label": "NIGHTHAWK",
+        "value": "DISCOUNT CARD"
+      }
+    ],
+    "secondaryFields": [
+      {
+        "key": "value",
+        "label": "VALUE",
+        "value": "$20"
+      },
+      {
+        "key": "validThru",
+        "label": "VALID THRU",
+        "value": "07/31/2027"
+      }
+    ],
+    "auxiliaryFields": [
+      {
+        "key": "school",
+        "label": "SCHOOL",
+        "value": "Del Norte High School Football"
+      }
+    ],
+    "backFields": [
+      {
+        "key": "instructions",
+        "label": "CARD MUST BE PRESENTED FOR DISCOUNT",
+        "value": "Show this pass to the cashier or have them scan the QR code. The cashier will enter the discount code into their POS system to apply your discount."
+      },
+      {
+        "key": "businesses",
+        "label": "PARTICIPATING BUSINESSES",
+        "value": "Baskin Robbins — BOGO 50% off scoops\nHarland Brewing — 10% off\nBoard & Brew — 10% off\nL&L Hawaiian Barbecue — 10% off\nKahoots — 20% off treats & bones\nMostra Coffee — 10% off\nRosinas — 10% off\nDonut Touch — 10% off\nSushi Ken — 20% off, dine-in/carry out\nFlippin Pizza — $5 off orders over $15, 1 per customer\nRound Table Pizza (Rancho Bernardo) — 10% off"
+      },
+      {
+        "key": "terms",
+        "label": "IMPORTANT",
+        "value": "NOT GOOD WITH ANY OTHER OFFER. This discount card is issued by Del Norte High School Football. One discount per transaction unless otherwise noted."
+      }
+    ]
+  }
+}

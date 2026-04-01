@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:DelNorteFootballApp.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:server.js">
+   </FileRef>
+   <FileRef
+      location = "group:src">
+   </FileRef>
+   <FileRef
+      location = "group:models">
+   </FileRef>
+   <FileRef
+      location = "group:certs">
+   </FileRef>
+   <FileRef
+      location = "group:public">
+   </FileRef>
+   <FileRef
+      location = "group:package.json">
+   </FileRef>
+</Workspace>
