@@ -8,6 +8,8 @@
   "foregroundColor": "rgb(0, 45, 98)",
   "labelColor": "rgb(0, 45, 98)",
   "logoText": "DEL NORTE",
+  "webServiceURL": "https://localhost:3000/",
+  "authenticationToken": "PLACEHOLDER_TOKEN_",
   "generic": {
     "primaryFields": [
       {

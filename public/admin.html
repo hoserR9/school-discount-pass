@@ -25,7 +25,7 @@
 
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: 16px;
       max-width: 900px;
       margin: 0 auto 32px;
@@ -64,6 +64,7 @@
     }
     .badge-active { background: rgba(26,122,26,0.2); color: #4caf50; }
     .badge-inactive { background: rgba(204,0,0,0.2); color: #f44336; }
+
     .btn-deactivate {
       background: none;
       border: 1px solid #f44336;
@@ -74,7 +75,90 @@
       cursor: pointer;
     }
     .btn-deactivate:hover { background: rgba(244,67,54,0.1); }
+
     .empty { text-align: center; padding: 40px; color: #666; }
+
+    /* Promotions section */
+    .promo-form {
+      background: #141b2d;
+      border: 1px solid #1e2a42;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .promo-form h3 { color: #C5A55A; font-size: 14px; margin-bottom: 16px; }
+    .form-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .form-group {
+      flex: 1;
+      min-width: 200px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #888;
+      margin-bottom: 4px;
+    }
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #1e2a42;
+      border-radius: 6px;
+      background: #0a0f1a;
+      color: #e0e0e0;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+    }
+    .form-group input:focus, .form-group textarea:focus { border-color: #C5A55A; }
+    .form-group textarea { resize: vertical; min-height: 60px; }
+
+    .btn-create {
+      background: #C5A55A;
+      color: #0a0f1a;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-create:hover { background: #d4b96a; }
+
+    .btn-push {
+      background: #1a7a1a;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-left: 12px;
+    }
+    .btn-push:hover { background: #228b22; }
+    .btn-push:disabled { background: #333; color: #666; cursor: not-allowed; }
+
+    .push-status {
+      display: inline-block;
+      margin-left: 12px;
+      font-size: 13px;
+      color: #888;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .section-header h2 { margin-bottom: 0; }
   </style>
 </head>
 <body>
@@ -96,19 +180,62 @@
       <div class="number" id="totalScans">-</div>
       <div class="label">Total Scans</div>
     </div>
+    <div class="stat-card">
+      <div class="number" id="registeredDevices">-</div>
+      <div class="label">Wallet Devices</div>
+    </div>
   </div>
 
+  <!-- Promotions Section -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Promotions</h2>
+      <div>
+        <button class="btn-push" id="pushBtn" onclick="pushUpdate()">Push Update to All Devices</button>
+        <span class="push-status" id="pushStatus"></span>
+      </div>
+    </div>
+
+    <div class="promo-form">
+      <h3>Create New Promotion</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" id="promoTitle" placeholder="e.g. Game Day Special">
+        </div>
+        <div class="form-group">
+          <label>Expires (optional)</label>
+          <input type="datetime-local" id="promoUntil">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group" style="flex:2">
+          <label>Message</label>
+          <textarea id="promoMessage" placeholder="e.g. Show your card at the snack bar tonight for a free drink!"></textarea>
+        </div>
+      </div>
+      <button class="btn-create" onclick="createPromotion()">Create Promotion</button>
+    </div>
+
+    <table>
+      <thead><tr><th>Title</th><th>Message</th><th>Created</th><th>Expires</th><th>Status</th><th></th></tr></thead>
+      <tbody id="promoBody"><tr><td colspan="6" class="empty">Loading...</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- Business Usage -->
   <div class="section">
     <h2>Usage by Business</h2>
-    <table id="bizTable">
+    <table>
       <thead><tr><th>Business</th><th>Total Scans</th><th>Unique Cards</th><th>Last Scan</th></tr></thead>
       <tbody id="bizBody"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody>
     </table>
   </div>
 
+  <!-- All Cards -->
   <div class="section">
     <h2>All Cards</h2>
-    <table id="cardsTable">
+    <table>
       <thead><tr><th>Card ID</th><th>Holder</th><th>Issued</th><th>Valid Thru</th><th>Scans</th><th>Status</th><th></th></tr></thead>
       <tbody id="cardsBody"><tr><td colspan="7" class="empty">Loading...</td></tr></tbody>
     </table>
@@ -116,16 +243,38 @@
 
   <script>
     async function loadDashboard() {
-      const [statsRes, cardsRes] = await Promise.all([
+      const [statsRes, cardsRes, promosRes] = await Promise.all([
         fetch('/api/stats'),
-        fetch('/api/cards')
+        fetch('/api/cards'),
+        fetch('/api/promotions'),
       ]);
       const stats = await statsRes.json();
       const cards = await cardsRes.json();
+      const promos = await promosRes.json();
 
+      // Stats
       document.getElementById('totalCards').textContent = stats.totalCards;
       document.getElementById('activeCards').textContent = stats.activeCards;
       document.getElementById('totalScans').textContent = stats.totalScans;
+      document.getElementById('registeredDevices').textContent = stats.registeredDevices;
+
+      // Promotions table
+      const promoBody = document.getElementById('promoBody');
+      if (promos.length === 0) {
+        promoBody.innerHTML = '<tr><td colspan="6" class="empty">No promotions yet. Create one above to push to all cardholders.</td></tr>';
+      } else {
+        promoBody.innerHTML = promos.map(p => {
+          const isActive = p.is_active && (!p.active_until || new Date(p.active_until) > new Date());
+          return `<tr>
+            <td><strong>${esc(p.title)}</strong></td>
+            <td>${esc(p.message)}</td>
+            <td>${p.created_at}</td>
+            <td>${p.active_until || 'Never'}</td>
+            <td><span class="badge ${isActive ? 'badge-active' : 'badge-inactive'}">${isActive ? 'Active' : 'Ended'}</span></td>
+            <td>${isActive ? '<button class="btn-deactivate" onclick="endPromo(' + p.id + ')">End</button>' : ''}</td>
+          </tr>`;
+        }).join('');
+      }
 
       // Business table
       const bizBody = document.getElementById('bizBody');
@@ -134,7 +283,7 @@
       } else {
         bizBody.innerHTML = stats.byBusiness.map(b => `
           <tr>
-            <td>${b.business_name || 'Unknown'}</td>
+            <td>${esc(b.business_name || 'Unknown')}</td>
             <td>${b.total_scans}</td>
             <td>${b.unique_cards}</td>
             <td>${b.last_scan || '-'}</td>
@@ -150,7 +299,7 @@
         cardsBody.innerHTML = cards.map(c => `
           <tr>
             <td><strong>${c.card_id}</strong></td>
-            <td>${c.holder_name || 'General'}</td>
+            <td>${esc(c.holder_name || 'General')}</td>
             <td>${c.issued_at}</td>
             <td>${c.valid_thru}</td>
             <td>${c.scan_count}</td>
@@ -161,14 +310,77 @@
       }
     }
 
+    async function createPromotion() {
+      const title = document.getElementById('promoTitle').value.trim();
+      const message = document.getElementById('promoMessage').value.trim();
+      const activeUntil = document.getElementById('promoUntil').value || null;
+
+      if (!title || !message) {
+        alert('Please enter both a title and message.');
+        return;
+      }
+
+      const res = await fetch('/api/promotions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, message, activeUntil }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        document.getElementById('promoTitle').value = '';
+        document.getElementById('promoMessage').value = '';
+        document.getElementById('promoUntil').value = '';
+        loadDashboard();
+
+        // Ask if they want to push immediately
+        if (confirm('Promotion created! Push update to all devices now?')) {
+          pushUpdate();
+        }
+      }
+    }
+
+    async function pushUpdate() {
+      const btn = document.getElementById('pushBtn');
+      const status = document.getElementById('pushStatus');
+
+      btn.disabled = true;
+      btn.textContent = 'Pushing...';
+      status.textContent = '';
+
+      try {
+        const res = await fetch('/api/push', { method: 'POST' });
+        const data = await res.json();
+        status.textContent = data.message;
+        status.style.color = data.sent > 0 ? '#4caf50' : '#C5A55A';
+      } catch (err) {
+        status.textContent = 'Push failed: ' + err.message;
+        status.style.color = '#f44336';
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Push Update to All Devices';
+    }
+
+    async function endPromo(id) {
+      if (!confirm('End this promotion?')) return;
+      await fetch('/api/promotions/' + id + '/deactivate', { method: 'POST' });
+      loadDashboard();
+    }
+
     async function deactivate(cardId) {
       if (!confirm('Deactivate card ' + cardId + '? This cannot be undone.')) return;
       await fetch('/api/cards/' + cardId + '/deactivate', { method: 'POST' });
       loadDashboard();
     }
 
+    function esc(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
     loadDashboard();
-    // Auto-refresh every 30 seconds
     setInterval(loadDashboard, 30000);
   </script>
 </body>

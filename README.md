@@ -1,14 +1,16 @@
 # Del Norte Nighthawk Discount Card — Apple Wallet
 
-Digital version of the Del Norte High School Football discount card that lives in Apple Wallet. Includes a QR code that businesses scan to verify the card, a tracking system that logs every scan, and an admin dashboard to monitor usage.
+Digital version of the Del Norte High School Football discount card that lives in Apple Wallet. Features QR code verification, scan tracking, push updates for promotions, and an admin dashboard.
 
 ## How It Works
 
 1. **Card holder** visits the web page or opens the iOS app and taps "Add to Apple Wallet"
-2. A unique discount card (`.pkpass`) is generated with its own Card ID and QR code
-3. **At a business**, the card holder shows the pass — the cashier scans the QR code
-4. Scanning opens a verification page showing the card status (Valid / Expired / Deactivated)
-5. Every scan is logged — the admin dashboard shows which businesses are getting traffic
+2. A unique discount card (`.pkpass`) is generated with its own Card ID, QR code, and auth token
+3. **Apple Wallet registers** the device with your server for push updates
+4. **At a business**, the card holder shows the pass — the cashier scans the QR code
+5. Scanning opens a verification page showing the card status (Valid / Expired / Deactivated)
+6. Every scan is logged — the admin dashboard shows which businesses are getting traffic
+7. **Push promotions** — create a promotion in the admin dashboard, push to all devices, and every cardholder's pass updates automatically with a lock-screen notification
 
 ## Quick Start
 
@@ -145,19 +147,74 @@ Visit `/admin` to see:
 - **Usage by Business** — breakdown of scans per business with unique card counts
 - **Card List** — every card with holder name, issue date, scan count, and a deactivate button
 
+## Push Updates & Promotions
+
+You can push updates to every cardholder's Apple Wallet at any time. Use cases:
+
+- **New business added** — update the participating businesses list
+- **Flash deals** — "This weekend only: 20% off at Board & Brew"
+- **Game day promos** — "Show your card at the snack bar tonight for a free drink"
+- **Seasonal specials** — holiday promotions from participating businesses
+- **Expiration reminders** — "Your card expires in 30 days"
+
+### How push updates work
+
+1. When a pass is added to Wallet, Apple registers the device with your server
+2. You create a promotion in the admin dashboard (`/admin`)
+3. Click "Push Update to All Devices"
+4. Your server sends a push notification via APNs (Apple Push Notification service)
+5. Apple tells each iPhone "this pass has an update"
+6. Each iPhone fetches the updated pass from your server (with the new promotion baked in)
+7. The cardholder sees a lock-screen notification and their card refreshes
+
+### APNs setup (required for push)
+
+Push updates require an APNs authentication key:
+
+1. In your Apple Developer account, go to **Keys**
+2. Click **+**, enable **Apple Push Notifications service (APNs)**
+3. Download the `.p8` key file
+4. Note the **Key ID** shown after creation
+
+Then set these environment variables:
+
+```bash
+APNS_KEY_PATH=./certs/apns-key.p8
+APNS_KEY_ID=YOUR_KEY_ID
+APNS_TEAM_ID=YOUR_TEAM_ID
+APNS_USE_SANDBOX=true        # set to false for production
+```
+
 ## API Endpoints
 
+### Pass Generation & Scanning
 | Method | Path | Description |
 |--------|------|-------------|
 | `GET` | `/pass` | Generate and download a new `.pkpass` file |
 | `GET` | `/pass?name=John` | Generate pass with holder name |
 | `GET` | `/scan/:cardId` | QR scan verification (shows card status, logs scan) |
 | `GET` | `/scan/:cardId?biz=BoardAndBrew` | QR scan with business name tracking |
+
+### Apple Wallet Web Service (called by Apple automatically)
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/v1/devices/:deviceId/registrations/:passTypeId/:serial` | Register device for push updates |
+| `GET` | `/v1/devices/:deviceId/registrations/:passTypeId` | List passes on device |
+| `DELETE` | `/v1/devices/:deviceId/registrations/:passTypeId/:serial` | Unregister device |
+| `GET` | `/v1/passes/:passTypeId/:serial` | Serve updated pass to device |
+| `POST` | `/v1/log` | Receive error logs from Apple Wallet |
+
+### Admin & Promotions
+| Method | Path | Description |
+|--------|------|-------------|
 | `GET` | `/admin` | Admin dashboard |
 | `GET` | `/api/cards` | JSON list of all cards |
-| `GET` | `/api/cards/:id/scans` | JSON list of scans for a card |
-| `GET` | `/api/stats` | JSON usage statistics |
+| `GET` | `/api/stats` | JSON usage statistics (includes registered device count) |
 | `POST` | `/api/cards/:id/deactivate` | Deactivate a card |
+| `GET` | `/api/promotions` | List all promotions |
+| `POST` | `/api/promotions` | Create a promotion `{title, message, activeUntil?}` |
+| `POST` | `/api/promotions/:id/deactivate` | End a promotion |
+| `POST` | `/api/push` | Push update to all registered devices |
 
 ## Participating Businesses (2026-2027)
 
