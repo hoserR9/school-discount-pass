@@ -44,8 +44,8 @@ async function renderWalletPass() {
     <!-- Auxiliary fields -->
     <text x="40" y="248" font-family="Arial" font-size="10" fill="#002D62" opacity="0.7">CARD ID</text>
     <text x="40" y="266" font-family="monospace" font-weight="700" font-size="14" fill="#002D62">DN-8F3A2B1C</text>
-    <text x="200" y="248" font-family="Arial" font-size="10" fill="#002D62" opacity="0.7">SCHOOL</text>
-    <text x="200" y="266" font-family="Arial" font-weight="700" font-size="12" fill="#002D62">Del Norte HS Football</text>
+    <text x="200" y="248" font-family="Arial" font-size="10" fill="#002D62" opacity="0.7">PROMO CODE</text>
+    <text x="200" y="266" font-family="Arial Black" font-weight="900" font-size="16" fill="#002D62" letter-spacing="2">DN2026</text>
 
     <!-- Divider -->
     <line x1="40" y1="285" x2="${w-60}" y2="285" stroke="#002D62" stroke-width="0.5" opacity="0.3"/>
