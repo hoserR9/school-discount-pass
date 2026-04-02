@@ -18,7 +18,7 @@ const WHITE = "FFFFFF";
 const OFF_WHITE = "F5F0E6";
 const LIGHT_GRAY = "A0A0A0";
 
-const IMG_DIR = path.resolve(__dirname, "images");
+const EXPORTS_DIR = path.resolve(__dirname, "../design/canva-exports");
 const DESIGN_DIR = path.resolve(__dirname, "../design");
 
 function renderIconSvg(Icon, color, size = 256) {
@@ -53,15 +53,14 @@ async function buildSponsorDeck() {
     navyHandshake: await iconPng(FaHandshake, `#${NAVY}`),
   };
 
-  const cardFront = await imgToBase64(path.join(DESIGN_DIR, "card-front.png"));
-  const cardBack = await imgToBase64(path.join(DESIGN_DIR, "card-back.png"));
-  const walletMockup = await imgToBase64(path.join(IMG_DIR, "wallet-pass-mockup.png"));
-  const scanMockup = await imgToBase64(path.join(IMG_DIR, "scan-verification-mockup.png"));
-  const sponsorDash = await imgToBase64(path.join(IMG_DIR, "sponsor-dashboard-mockup.png"));
-  const claimMockup = await imgToBase64(path.join(IMG_DIR, "claim-page-mockup.png"));
-  const qrCode = await imgToBase64(path.join(IMG_DIR, "sample-qr-code.png"));
-  const dnLogo = await imgToBase64(path.join(DESIGN_DIR, "DNFOOTBALL_LOGO.png"));
-  const dnLogoHead = await imgToBase64(path.join(DESIGN_DIR, "dn-logo-full.jpeg"));
+  const cardFront = await imgToBase64(path.join(EXPORTS_DIR, "01-physical-card-front.png"));
+  const cardBack = await imgToBase64(path.join(EXPORTS_DIR, "02-physical-card-back.png"));
+  const walletMockup = await imgToBase64(path.join(EXPORTS_DIR, "03-digital-wallet-card.png"));
+  const scanMockup = await imgToBase64(path.join(EXPORTS_DIR, "04-scan-verification-valid.png"));
+  const sponsorDash = await imgToBase64(path.join(EXPORTS_DIR, "07-sponsor-dashboard.png"));
+  const claimMockup = await imgToBase64(path.join(EXPORTS_DIR, "06-claim-page-mobile.png"));
+  const qrCode = await imgToBase64(path.join(EXPORTS_DIR, "11-sample-qr-code.png"));
+  const dnLogo = await imgToBase64(path.join(EXPORTS_DIR, "08-dn-nighthawk-logo-transparent.png"));
 
   // ═══════ SLIDE 1: TITLE ═══════
   {
@@ -355,14 +354,14 @@ async function buildBoardDeck() {
     dollar: await iconPng(FaDollarSign, `#${GOLD}`),
   };
 
-  const cardFront = await imgToBase64(path.join(DESIGN_DIR, "card-front.png"));
-  const cardBack = await imgToBase64(path.join(DESIGN_DIR, "card-back.png"));
-  const walletMockup = await imgToBase64(path.join(IMG_DIR, "wallet-pass-mockup.png"));
-  const scanMockup = await imgToBase64(path.join(IMG_DIR, "scan-verification-mockup.png"));
-  const fraudMockup = await imgToBase64(path.join(IMG_DIR, "fraud-warning-mockup.png"));
-  const sponsorDash = await imgToBase64(path.join(IMG_DIR, "sponsor-dashboard-mockup.png"));
-  const qrCode = await imgToBase64(path.join(IMG_DIR, "sample-qr-code.png"));
-  const dnLogo = await imgToBase64(path.join(DESIGN_DIR, "DNFOOTBALL_LOGO.png"));
+  const cardFront = await imgToBase64(path.join(EXPORTS_DIR, "01-physical-card-front.png"));
+  const cardBack = await imgToBase64(path.join(EXPORTS_DIR, "02-physical-card-back.png"));
+  const walletMockup = await imgToBase64(path.join(EXPORTS_DIR, "03-digital-wallet-card.png"));
+  const scanMockup = await imgToBase64(path.join(EXPORTS_DIR, "04-scan-verification-valid.png"));
+  const fraudMockup = await imgToBase64(path.join(EXPORTS_DIR, "05-fraud-warning-screen.png"));
+  const sponsorDash = await imgToBase64(path.join(EXPORTS_DIR, "07-sponsor-dashboard.png"));
+  const qrCode = await imgToBase64(path.join(EXPORTS_DIR, "11-sample-qr-code.png"));
+  const dnLogo = await imgToBase64(path.join(EXPORTS_DIR, "08-dn-nighthawk-logo-transparent.png"));
 
   // ═══════ SLIDE 1: TITLE ═══════
   {
