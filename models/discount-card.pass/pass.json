@@ -32,16 +32,21 @@
     ],
     "auxiliaryFields": [
       {
+        "key": "promoCode",
+        "label": "PROMO CODE",
+        "value": "DN2026"
+      },
+      {
         "key": "school",
         "label": "SCHOOL",
-        "value": "Del Norte High School Football"
+        "value": "Del Norte HS Football"
       }
     ],
     "backFields": [
       {
         "key": "instructions",
         "label": "CARD MUST BE PRESENTED FOR DISCOUNT",
-        "value": "Show this pass to the cashier or have them scan the QR code. The cashier will enter the discount code into their POS system to apply your discount."
+        "value": "Option 1: Have the cashier SCAN the QR code on this card.\nOption 2: Tell the cashier the promo code DN2026.\nOption 3: Simply show this card on your phone — the cashier applies the discount.\n\nAll three methods are valid at every participating business."
       },
       {
         "key": "businesses",

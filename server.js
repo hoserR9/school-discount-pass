@@ -492,6 +492,7 @@ function renderScanPage(card, cardId, scans = []) {
       ${card.holder_name ? `<div class="holder-name">${card.holder_name}</div>` : ''}
       ${warningHtml}
       <div class="detail"><span class="label">Card ID</span><span>${cardId}</span></div>
+      <div class="detail"><span class="label">Promo Code</span><span style="font-weight:700;font-size:16px;letter-spacing:2px">DN2026</span></div>
       ${!card.holder_name ? '<div class="detail"><span class="label">Holder</span><span>General</span></div>' : ''}
       <div class="detail"><span class="label">Valid Thru</span><span>${card.valid_thru}</span></div>
       <div class="detail"><span class="label">Total Scans</span><span>${scans.length}</span></div>

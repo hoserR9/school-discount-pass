@@ -37,7 +37,7 @@ function buildBackFields() {
       key: "instructions",
       label: "CARD MUST BE PRESENTED FOR DISCOUNT",
       value:
-        "Show this pass to the cashier or have them scan the QR code. The cashier will enter the discount code into their POS system to apply your discount.",
+        "Option 1: Have the cashier SCAN the QR code on this card.\nOption 2: Tell the cashier the promo code DN2026.\nOption 3: Simply show this card on your phone — the cashier applies the discount.\n\nAll three methods are valid at every participating business.",
     },
     {
       key: "businesses",
@@ -149,9 +149,9 @@ async function generatePass(options = {}) {
             value: cardId,
           },
           {
-            key: "school",
-            label: "SCHOOL",
-            value: "Del Norte HS Football",
+            key: "promoCode",
+            label: "PROMO CODE",
+            value: "DN2026",
           },
         ],
         backFields: buildBackFields(),
