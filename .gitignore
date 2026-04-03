@@ -3,7 +3,9 @@ data/
 output/
 *.pkpass
 .DS_Store
+pitch/~$*
 
-# Certificates — NEVER commit real certs to git
-# The placeholder self-signed certs are fine for development
-# certs/
+# Certificates — placeholder certs are in git for development.
+# When you get real Apple certs, set them as Railway environment
+# variables (SIGNER_CERT, SIGNER_KEY, WWDR_CERT) instead of
+# committing them to git.

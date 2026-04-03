@@ -39,12 +39,14 @@ async function pushUpdateToAll() {
     return { sent: 0, failed: 0, errors: [], message: "No registered devices" };
   }
 
-  // Check if APNs key exists
-  if (!fs.existsSync(APNS_KEY_PATH)) {
+  // Check if APNs key is available (env var or file)
+  const hasEnvKey = !!process.env.APNS_KEY;
+  const hasFileKey = fs.existsSync(APNS_KEY_PATH);
+  if (!hasEnvKey && !hasFileKey) {
     return {
       sent: 0,
       failed: 0,
-      errors: ["APNs key file not found. Place your .p8 key at " + APNS_KEY_PATH],
+      errors: ["APNs key not found. Set APNS_KEY env var or place .p8 at " + APNS_KEY_PATH],
       message: "APNs not configured — push skipped",
     };
   }
@@ -56,7 +58,10 @@ async function pushUpdateToAll() {
     const { TokenConnector } = await import("hapns/connectors/token");
     const { send } = await import("hapns/send");
 
-    const p8key = new Uint8Array(fs.readFileSync(APNS_KEY_PATH));
+    // Load APNs key from env (base64) or file
+    const p8key = hasEnvKey
+      ? new Uint8Array(Buffer.from(process.env.APNS_KEY, "base64"))
+      : new Uint8Array(fs.readFileSync(APNS_KEY_PATH));
 
     const connector = TokenConnector({
       key: p8key,
@@ -109,7 +114,9 @@ async function pushUpdateForSerial(serialNumber) {
   // Touch the card's last_updated timestamp so the device knows there's a new version
   touchCardUpdated.run(serialNumber);
 
-  if (!fs.existsSync(APNS_KEY_PATH)) {
+  const hasEnvKey2 = !!process.env.APNS_KEY;
+  const hasFileKey2 = fs.existsSync(APNS_KEY_PATH);
+  if (!hasEnvKey2 && !hasFileKey2) {
     return {
       sent: 0,
       failed: 0,
@@ -118,14 +125,15 @@ async function pushUpdateForSerial(serialNumber) {
     };
   }
 
-  // Same push logic as pushUpdateToAll but scoped to one serial's devices
   try {
     const { BackgroundNotification } = await import("hapns/notifications/BackgroundNotification");
     const { Device } = await import("hapns/targets/device");
     const { TokenConnector } = await import("hapns/connectors/token");
     const { send } = await import("hapns/send");
 
-    const p8key = new Uint8Array(fs.readFileSync(APNS_KEY_PATH));
+    const p8key = hasEnvKey2
+      ? new Uint8Array(Buffer.from(process.env.APNS_KEY, "base64"))
+      : new Uint8Array(fs.readFileSync(APNS_KEY_PATH));
     const connector = TokenConnector({
       key: p8key,
       keyId: APNS_KEY_ID,

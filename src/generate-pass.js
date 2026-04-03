@@ -21,6 +21,15 @@ function generateAuthToken() {
 }
 
 function loadCertificates() {
+  // Railway: load certs from environment variables (base64 encoded)
+  // Local: load from files in certs/ directory
+  if (process.env.SIGNER_CERT) {
+    return {
+      wwdr: Buffer.from(process.env.WWDR_CERT, "base64"),
+      signerCert: Buffer.from(process.env.SIGNER_CERT, "base64"),
+      signerKey: Buffer.from(process.env.SIGNER_KEY, "base64"),
+    };
+  }
   return {
     wwdr: fs.readFileSync(path.join(CERTS_DIR, "wwdr.pem")),
     signerCert: fs.readFileSync(path.join(CERTS_DIR, "signerCert.pem")),
