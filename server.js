@@ -623,10 +623,10 @@ function renderClaimPage(card, cardId, alreadyClaimed = false) {
 // ═══════════════════════════════════════════════
 
 const { upsertPosConfig, getAllPosConfigs, getPosConfigForScan } = (() => {
-  // Lazy import to avoid circular dependency issues
   const db = require("./src/database");
   return { upsertPosConfig: db.upsertPosConfig, getAllPosConfigs: db.getAllPosConfigs, getPosConfigForScan: db.getPosConfigForScan };
 })();
+const { validateForPOS, getSupportedPOSTypes } = require("./src/integrations");
 
 app.get("/api/pos-config", (req, res) => {
   const configs = getAllPosConfigs.all();
@@ -636,6 +636,10 @@ app.get("/api/pos-config", (req, res) => {
     config: JSON.parse(c.config_json || "{}"),
   }));
   res.json(parsed);
+});
+
+app.get("/api/pos-types", (req, res) => {
+  res.json(getSupportedPOSTypes());
 });
 
 app.post("/api/pos-config", (req, res) => {
