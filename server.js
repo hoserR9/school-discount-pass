@@ -67,10 +67,47 @@ app.get("/card/:cardId", (req, res) => {
   const card = getCard.get(cardId);
 
   if (!card) {
+    // POS/API requesting JSON
+    if (req.get("Accept") === "application/json" || req.query.format === "json") {
+      return res.status(404).json({ valid: false, error: "Card not found", cardId });
+    }
     return res.status(404).send(renderScanPage(null, cardId));
   }
 
-  // Detect if this is likely a customer (mobile browser) vs a business (POS/desktop)
+  // ── POS Integration: JSON response for POS systems ──
+  // POS scanners or API clients that send Accept: application/json
+  // or append ?format=json get structured data they can use directly
+  if (req.get("Accept") === "application/json" || req.query.format === "json") {
+    const isActive = card.is_active;
+    const now = new Date();
+    const validThru = new Date(card.valid_thru);
+    const isExpired = now > validThru;
+    const isValid = isActive && !isExpired;
+
+    const oneDayAgo = new Date(now - 24 * 60 * 60 * 1000).toISOString();
+    const allScans = getScansForCard.all(cardId);
+    const todayScans = allScans.filter(s => s.scanned_at > oneDayAgo);
+
+    // Log the scan
+    const businessName = req.query.biz || null;
+    logScan.run(cardId, businessName, req.ip, req.get("user-agent") || "");
+
+    console.log(`[POS SCAN] Card ${cardId} — JSON response${businessName ? ` for ${businessName}` : ""}`);
+
+    return res.json({
+      valid: isValid,
+      status: !isActive ? "deactivated" : isExpired ? "expired" : "valid",
+      cardId,
+      holder: card.holder_name || null,
+      validThru: card.valid_thru,
+      totalScans: allScans.length + 1,
+      scansToday: todayScans.length + 1,
+      flagged: todayScans.length >= 5,
+      lastScan: allScans.length > 0 ? allScans[0].scanned_at : null,
+    });
+  }
+
+  // ── Mobile/Browser: detect customer vs business ──
   const ua = (req.get("user-agent") || "").toLowerCase();
   const isMobile = /iphone|ipad|android|mobile/i.test(ua);
 
@@ -86,7 +123,7 @@ app.get("/card/:cardId", (req, res) => {
     return res.send(renderClaimPage(card, cardId, true));
   }
 
-  // Business scan → log it and show verification
+  // Business scan via browser → log it and show verification
   const businessName = req.query.biz || null;
   logScan.run(cardId, businessName, req.ip, req.get("user-agent") || "");
   const scans = getScansForCard.all(cardId);
@@ -580,6 +617,42 @@ function renderClaimPage(card, cardId, alreadyClaimed = false) {
     ` : ''}
   </body></html>`;
 }
+
+// ═══════════════════════════════════════════════
+//  POS INTEGRATION CONFIG API
+// ═══════════════════════════════════════════════
+
+const { upsertPosConfig, getAllPosConfigs, getPosConfigForScan } = (() => {
+  // Lazy import to avoid circular dependency issues
+  const db = require("./src/database");
+  return { upsertPosConfig: db.upsertPosConfig, getAllPosConfigs: db.getAllPosConfigs, getPosConfigForScan: db.getPosConfigForScan };
+})();
+
+app.get("/api/pos-config", (req, res) => {
+  const configs = getAllPosConfigs.all();
+  // Parse config_json for each
+  const parsed = configs.map(c => ({
+    ...c,
+    config: JSON.parse(c.config_json || "{}"),
+  }));
+  res.json(parsed);
+});
+
+app.post("/api/pos-config", (req, res) => {
+  const { businessName, posType, config } = req.body;
+  if (!businessName || !posType) {
+    return res.status(400).json({ error: "businessName and posType required" });
+  }
+
+  const validTypes = ["manual", "toast", "square"];
+  if (!validTypes.includes(posType)) {
+    return res.status(400).json({ error: `posType must be one of: ${validTypes.join(", ")}` });
+  }
+
+  upsertPosConfig.run(businessName, posType, JSON.stringify(config || {}));
+  console.log(`[POS CONFIG] ${businessName} → ${posType}`);
+  res.json({ success: true });
+});
 
 // ═══════════════════════════════════════════════
 //  SPONSOR PORTAL — each business sees their own data

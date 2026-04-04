@@ -215,6 +215,36 @@ const getScansForBusiness = db.prepare(`
   ORDER BY s.scanned_at DESC
 `);
 
+// ── POS Integration config ──
+db.exec(`
+  CREATE TABLE IF NOT EXISTS pos_config (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    business_name TEXT NOT NULL UNIQUE,
+    pos_type TEXT NOT NULL DEFAULT 'manual',
+    config_json TEXT NOT NULL DEFAULT '{}',
+    is_active INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+`);
+
+const upsertPosConfig = db.prepare(`
+  INSERT INTO pos_config (business_name, pos_type, config_json)
+  VALUES (?, ?, ?)
+  ON CONFLICT(business_name) DO UPDATE SET
+    pos_type = excluded.pos_type,
+    config_json = excluded.config_json,
+    updated_at = datetime('now')
+`);
+
+const getPosConfig = db.prepare(`SELECT * FROM pos_config WHERE business_name = ?`);
+
+const getAllPosConfigs = db.prepare(`SELECT * FROM pos_config ORDER BY business_name ASC`);
+
+const getPosConfigForScan = db.prepare(`
+  SELECT pos_type, config_json FROM pos_config WHERE business_name = ? AND is_active = 1
+`);
+
 const getStatsForBusiness = db.prepare(`
   SELECT
     COUNT(*) as total_scans,
@@ -261,4 +291,9 @@ module.exports = {
   getAllSponsors,
   getScansForBusiness,
   getStatsForBusiness,
+  // POS Integration
+  upsertPosConfig,
+  getPosConfig,
+  getAllPosConfigs,
+  getPosConfigForScan,
 };

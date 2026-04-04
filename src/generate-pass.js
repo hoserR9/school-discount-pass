@@ -168,13 +168,33 @@ async function generatePass(options = {}) {
     }
   );
 
-  // QR code encodes the scan URL
-  pass.setBarcodes({
-    message: qrUrl,
-    format: "PKBarcodeFormatQR",
-    messageEncoding: "iso-8859-1",
-    altText: cardId,
-  });
+  // Multiple barcode formats for different POS systems:
+  // - QR code (primary): encodes the scan URL for smart scanners and phones
+  // - Code128 (alternate): encodes just the card ID for legacy POS barcode scanners
+  pass.setBarcodes(
+    {
+      message: qrUrl,
+      format: "PKBarcodeFormatQR",
+      messageEncoding: "iso-8859-1",
+      altText: cardId,
+    },
+    {
+      message: cardId,
+      format: "PKBarcodeFormatCode128",
+      messageEncoding: "iso-8859-1",
+      altText: cardId,
+    }
+  );
+
+  // NFC: allows tap-to-verify on NFC-enabled POS terminals
+  // The NFC message contains the card ID (11 chars, well under 64 char limit)
+  // encryptionPublicKey is required by Apple — use placeholder until real key is generated
+  if (process.env.NFC_PUBLIC_KEY) {
+    pass.setNFC({
+      message: cardId,
+      encryptionPublicKey: process.env.NFC_PUBLIC_KEY,
+    });
+  }
 
   return { buffer: await pass.getAsBuffer(), cardId, serialNumber, authToken };
 }
