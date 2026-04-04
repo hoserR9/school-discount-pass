@@ -100,7 +100,7 @@ async function buildSponsorDeck() {
     s.addText("Apple Wallet", { x: 5.5, y: 1.2, w: 4, h: 0.4, fontSize: 13, fontFace: "Arial", bold: true, color: NAVY, align: "center", margin: 0 });
     s.addImage({ data: walletMockup, x: 6.2, y: 1.5, w: 2.3, h: 3.56, sizing: { type: "contain", w: 2.3, h: 3.56 } });
 
-    s.addText("Same card. Now digital. Always in their phone.", { x: 0.8, y: 5.0, w: 8.4, h: 0.4, fontSize: 14, fontFace: "Arial", italic: true, color: "888888", margin: 0 });
+    s.addText("Every person gets a physical card with a unique QR code. Scan it to add to Apple Wallet.", { x: 0.8, y: 5.0, w: 8.4, h: 0.4, fontSize: 13, fontFace: "Arial", bold: true, color: NAVY, margin: 0 });
   }
 
   // ═══════ SLIDE 3: HOW IT WORKS — CUSTOMER (with claim page mockup) ═══════
@@ -138,7 +138,7 @@ async function buildSponsorDeck() {
       { icon: icons.navyMobile, text: "Your business listed on every digital card" },
       { icon: icons.navyQr, text: "Customer scans QR → you see this verification screen" },
       { icon: icons.navyChart, text: "Every visit tracked — you get usage reports" },
-      { icon: icons.navyHandshake, text: "No POS changes — cashier just scans and applies discount" },
+      { icon: icons.navyHandshake, text: "Integrates with your POS (Toast, Square, Clover, and more)" },
     ];
     items.forEach((item, i) => {
       const y = 1.3 + i * 0.85;
@@ -159,7 +159,7 @@ async function buildSponsorDeck() {
 
     // Card back image — large, centered
     s.addImage({ data: cardBack, x: 1.0, y: 1.2, w: 8.0, h: 4.0, sizing: { type: "contain", w: 8.0, h: 4.0 } });
-    s.addText("Each card has a unique QR code linking the physical card to Apple Wallet", { x: 0.8, y: 5.0, w: 8.4, h: 0.4, fontSize: 12, fontFace: "Arial", italic: true, color: LIGHT_GOLD, margin: 0 });
+    s.addText("Every physical card has a unique QR code on the back. Scan it to load the digital version into Apple Wallet.", { x: 0.8, y: 5.0, w: 8.4, h: 0.4, fontSize: 12, fontFace: "Arial", bold: true, color: LIGHT_GOLD, margin: 0 });
   }
 
   // ═══════ SLIDE 6: WHY DIGITAL BEATS PHYSICAL ═══════
@@ -240,7 +240,59 @@ async function buildSponsorDeck() {
     });
   }
 
-  // ═══════ SLIDE 9: YOUR OWN DASHBOARD (with mockup) ═══════
+  // ═══════ SLIDE 9: WORKS WITH YOUR POS ═══════
+  {
+    const s = pres.addSlide();
+    s.background = { color: WHITE };
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 10, h: 1.1, fill: { color: NAVY } });
+    s.addText("WORKS WITH YOUR POS", { x: 0.8, y: 0.25, w: 8, h: 0.6, fontSize: 28, fontFace: "Arial Black", bold: true, color: GOLD, margin: 0 });
+
+    // Tier 1
+    s.addShape(pres.shapes.RECTANGLE, { x: 0.6, y: 1.3, w: 8.8, h: 1.1, fill: { color: OFF_WHITE }, shadow: makeShadow() });
+    s.addShape(pres.shapes.RECTANGLE, { x: 0.6, y: 1.3, w: 0.07, h: 1.1, fill: { color: GOLD } });
+    s.addText("Full API Integration", { x: 0.9, y: 1.35, w: 3, h: 0.35, fontSize: 14, fontFace: "Arial", bold: true, color: NAVY, margin: 0 });
+    s.addText("Toast, Square, Clover, Shopify — discount applies automatically at the POS when the card is scanned. No manual entry.", { x: 0.9, y: 1.7, w: 8.2, h: 0.5, fontSize: 12, fontFace: "Arial", color: "555555", margin: 0 });
+
+    // Tier 2
+    s.addShape(pres.shapes.RECTANGLE, { x: 0.6, y: 2.6, w: 8.8, h: 1.1, fill: { color: OFF_WHITE }, shadow: makeShadow() });
+    s.addShape(pres.shapes.RECTANGLE, { x: 0.6, y: 2.6, w: 0.07, h: 1.1, fill: { color: GOLD } });
+    s.addText("Barcode Scan Integration", { x: 0.9, y: 2.65, w: 3, h: 0.35, fontSize: 14, fontFace: "Arial", bold: true, color: NAVY, margin: 0 });
+    s.addText("Revel, Heartland, SpotOn — POS reads the barcode on the card and applies the configured coupon.", { x: 0.9, y: 3.0, w: 8.2, h: 0.5, fontSize: 12, fontFace: "Arial", color: "555555", margin: 0 });
+
+    // Tier 3
+    s.addShape(pres.shapes.RECTANGLE, { x: 0.6, y: 3.9, w: 8.8, h: 1.1, fill: { color: OFF_WHITE }, shadow: makeShadow() });
+    s.addShape(pres.shapes.RECTANGLE, { x: 0.6, y: 3.9, w: 0.07, h: 1.1, fill: { color: GOLD } });
+    s.addText("Any Other POS", { x: 0.9, y: 3.95, w: 3, h: 0.35, fontSize: 14, fontFace: "Arial", bold: true, color: NAVY, margin: 0 });
+    s.addText("Cashier scans the QR code or views the card on the customer's phone. Verification screen confirms the card is valid.", { x: 0.9, y: 4.3, w: 8.2, h: 0.5, fontSize: 12, fontFace: "Arial", color: "555555", margin: 0 });
+
+    s.addText("We configure everything for you. No tech changes needed at your business.", { x: 0.8, y: 5.1, w: 8.4, h: 0.35, fontSize: 12, fontFace: "Arial", bold: true, italic: true, color: NAVY, margin: 0 });
+  }
+
+  // ═══════ SLIDE 10: SECURE & PRIVATE ═══════
+  {
+    const s = pres.addSlide();
+    s.background = { color: DARK_NAVY };
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 10, h: 0.06, fill: { color: GOLD } });
+    s.addText("SECURE & PRIVATE", { x: 0.8, y: 0.35, w: 9, h: 0.5, fontSize: 24, fontFace: "Arial Black", bold: true, color: GOLD, margin: 0 });
+
+    const secItems = [
+      { title: "Unique Cryptographic IDs", desc: "Every card has a one-of-a-kind ID that can't be guessed, copied, or faked" },
+      { title: "Anti-Sharing Protection", desc: "Cards scanned too many times get flagged automatically with a warning" },
+      { title: "Name Verification", desc: "Cashier sees the cardholder's name on the verification screen" },
+      { title: "Your Data Is Yours", desc: "Sponsors only see their own analytics — never other sponsors' data" },
+      { title: "No Personal Data Collected", desc: "No emails, phone numbers, or payment info — just an optional name" },
+      { title: "Encrypted & Compliant", desc: "HTTPS everywhere, CCPA compliant, hosted on secure cloud infrastructure" },
+    ];
+    secItems.forEach((item, i) => {
+      const y = 1.0 + i * 0.7;
+      s.addShape(pres.shapes.RECTANGLE, { x: 0.6, y, w: 8.8, h: 0.58, fill: { color: "0A1A35" } });
+      s.addShape(pres.shapes.RECTANGLE, { x: 0.6, y, w: 0.07, h: 0.58, fill: { color: GOLD } });
+      s.addText(item.title, { x: 0.9, y, w: 3, h: 0.58, fontSize: 12, fontFace: "Arial", bold: true, color: GOLD, valign: "middle", margin: 0 });
+      s.addText(item.desc, { x: 3.9, y, w: 5.3, h: 0.58, fontSize: 11, fontFace: "Arial", color: WHITE, valign: "middle", margin: 0 });
+    });
+  }
+
+  // ═══════ SLIDE 11: YOUR OWN DASHBOARD (with mockup) ═══════
   {
     const s = pres.addSlide();
     s.background = { color: DARK_NAVY };
@@ -333,7 +385,7 @@ async function buildSponsorDeck() {
   }
 
   await pres.writeFile({ fileName: path.resolve(__dirname, "Del-Norte-Nighthawk-Sponsor-Pitch.pptx") });
-  console.log("  Sponsor deck saved (13 slides)");
+  console.log("  Sponsor deck saved (15 slides)");
 }
 
 // ═══════════════════════════════════════════════
