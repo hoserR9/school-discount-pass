@@ -64,7 +64,17 @@ Del Norte High School Football — 2026-2027 Season
 
 ---
 
-### Slide 8: Tracking & Reporting
+### Slide 8: Works With Your POS
+The Nighthawk card works with every POS system your business uses:
+- **Toast, Square, Clover, Shopify** — full API integration, discount applies automatically
+- **Revel, Heartland, SpotOn** — barcode scan integration
+- **Any other POS** — cashier scans the QR code or sees the card on the customer's phone
+- **No tech changes needed** — we configure everything for you
+- Supports QR code scanning, 1D barcode scanning, and NFC tap
+
+---
+
+### Slide 9: Tracking & Reporting
 - Every QR code scan is logged with date and time
 - Sponsors receive usage reports showing:
   - Total visits from cardholders
@@ -74,7 +84,7 @@ Del Norte High School Football — 2026-2027 Season
 
 ---
 
-### Slide 9: Current Sponsors (2026-2027)
+### Slide 10: Current Sponsors (2026-2027)
 - Baskin Robbins
 - Harland Brewing
 - Board & Brew
@@ -89,7 +99,7 @@ Del Norte High School Football — 2026-2027 Season
 
 ---
 
-### Slide 10: Sponsorship Tiers
+### Slide 11: Sponsorship Tiers
 **Gold Sponsor — $500**
 - Featured at the top of the card
 - 2 push promotions per month
@@ -107,7 +117,7 @@ Del Norte High School Football — 2026-2027 Season
 
 ---
 
-### Slide 11: How to Get Started
+### Slide 12: How to Get Started
 1. Choose your sponsorship tier
 2. Tell us your discount offer (e.g., 10% off, BOGO, etc.)
 3. We add your business to the card — it goes live immediately
@@ -116,7 +126,7 @@ Del Norte High School Football — 2026-2027 Season
 
 ---
 
-### Slide 12: Your Own Dashboard
+### Slide 13: Your Own Dashboard
 Each sponsor gets a **private login** to view their analytics:
 - Total visits from cardholders
 - Unique customers
@@ -126,7 +136,7 @@ No app needed — works on any phone or computer with a simple access code.
 
 ---
 
-### Slide 13: Contact
+### Slide 14: Contact
 **Del Norte High School Football**
 Nighthawk Discount Card Program
 [Contact info here]
