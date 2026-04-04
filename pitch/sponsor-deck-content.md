@@ -74,7 +74,18 @@ The Nighthawk card works with every POS system your business uses:
 
 ---
 
-### Slide 9: Tracking & Reporting
+### Slide 9: Secure & Private
+- **Every card has a unique cryptographic ID** — can't be guessed, copied, or faked
+- **Anti-sharing protection** — cards scanned too many times get flagged automatically
+- **Cardholder name verification** — the cashier sees the name on screen and can verify identity
+- **Your data is yours** — sponsors only see their own business's analytics, never other sponsors'
+- **No personal data collected** — we don't collect emails, phone numbers, or payment info
+- **Encrypted** — all data transmitted over HTTPS, hosted on secure cloud infrastructure
+- **CCPA compliant** — cardholders can request data deletion at any time
+
+---
+
+### Slide 10: Tracking & Reporting
 - Every QR code scan is logged with date and time
 - Sponsors receive usage reports showing:
   - Total visits from cardholders
@@ -84,7 +95,7 @@ The Nighthawk card works with every POS system your business uses:
 
 ---
 
-### Slide 10: Current Sponsors (2026-2027)
+### Slide 11: Current Sponsors (2026-2027)
 - Baskin Robbins
 - Harland Brewing
 - Board & Brew
@@ -99,7 +110,7 @@ The Nighthawk card works with every POS system your business uses:
 
 ---
 
-### Slide 11: Sponsorship Tiers
+### Slide 12: Sponsorship Tiers
 **Gold Sponsor — $500**
 - Featured at the top of the card
 - 2 push promotions per month
@@ -117,7 +128,7 @@ The Nighthawk card works with every POS system your business uses:
 
 ---
 
-### Slide 12: How to Get Started
+### Slide 13: How to Get Started
 1. Choose your sponsorship tier
 2. Tell us your discount offer (e.g., 10% off, BOGO, etc.)
 3. We add your business to the card — it goes live immediately
@@ -126,7 +137,7 @@ The Nighthawk card works with every POS system your business uses:
 
 ---
 
-### Slide 13: Your Own Dashboard
+### Slide 14: Your Own Dashboard
 Each sponsor gets a **private login** to view their analytics:
 - Total visits from cardholders
 - Unique customers
@@ -136,7 +147,7 @@ No app needed — works on any phone or computer with a simple access code.
 
 ---
 
-### Slide 14: Contact
+### Slide 15: Contact
 **Del Norte High School Football**
 Nighthawk Discount Card Program
 [Contact info here]
