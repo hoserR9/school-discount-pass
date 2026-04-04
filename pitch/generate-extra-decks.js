@@ -678,12 +678,14 @@ async function buildOnboardingDeck() {
     s.addText("DAY 1 CHECKLIST", { x: 1.5, y: 0.35, w: 8, h: 0.5, fontSize: 24, fontFace: "Arial Black", bold: true, color: GOLD, margin: 0 });
 
     const tasks = [
-      { time: "30 min", task: "Accept GitHub collaborator invite", tip: "Check email" },
-      { time: "20 min", task: "Read README.md and docs/CONTRIBUTING.md", tip: "Get the full picture" },
-      { time: "15 min", task: "Install Node.js 18+ and clone the repo", tip: "brew install node" },
-      { time: "10 min", task: "Run npm install && npm start", tip: "Open http://localhost:3000" },
-      { time: "15 min", task: "Install Claude Code (optional but recommended)", tip: "claude.com/claude-code" },
-      { time: "30 min", task: "Make a small PR (fix a typo in README)", tip: "Practice the workflow" },
+      { time: "10 min", task: "Accept GitHub collaborator invite", tip: "Check email" },
+      { time: "15 min", task: "Install Node.js 18+", tip: "brew install node" },
+      { time: "15 min", task: "Install VS Code (code editor)", tip: "code.visualstudio.com" },
+      { time: "10 min", task: "Clone the repo and open in VS Code", tip: "git clone + File > Open Folder" },
+      { time: "10 min", task: "Run npm install && npm start", tip: "Use VS Code terminal (Ctrl+`)" },
+      { time: "15 min", task: "Install Claude Code in terminal", tip: "claude.com/claude-code" },
+      { time: "20 min", task: "Read docs/CONTRIBUTING.md and docs/TASKS.md", tip: "Understand the workflow" },
+      { time: "30 min", task: "Make a small PR (fix a typo in README)", tip: "Practice Git workflow" },
     ];
     tasks.forEach((t, i) => {
       const y = 1.1 + i * 0.68;
@@ -695,7 +697,37 @@ async function buildOnboardingDeck() {
     });
   }
 
-  // Slide 4: Project Structure
+  // Slide 4: Editor + Claude Code setup
+  {
+    const s = pres.addSlide();
+    s.background = { color: WHITE };
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 10, h: 1.1, fill: { color: NAVY } });
+    s.addText("EDITOR + CLAUDE CODE SETUP", { x: 0.8, y: 0.25, w: 8.4, h: 0.6, fontSize: 26, fontFace: "Arial Black", bold: true, color: GOLD, margin: 0 });
+
+    s.addText("Claude Code runs in the terminal. You need a code editor too.", { x: 0.8, y: 1.15, w: 8.4, h: 0.4, fontSize: 14, fontFace: "Arial", italic: true, color: "666666", margin: 0 });
+
+    // VS Code (recommended)
+    s.addShape(pres.shapes.RECTANGLE, { x: 0.6, y: 1.7, w: 4.3, h: 2.0, fill: { color: OFF_WHITE }, shadow: makeShadow() });
+    s.addShape(pres.shapes.RECTANGLE, { x: 0.6, y: 1.7, w: 4.3, h: 0.06, fill: { color: "1a7a1a" } });
+    s.addText("VS CODE (RECOMMENDED)", { x: 0.9, y: 1.85, w: 3.8, h: 0.35, fontSize: 13, fontFace: "Arial", bold: true, color: "1a7a1a", margin: 0 });
+    s.addText("Free, most popular code editor.\nEdit files in the editor panels.\nRun Claude Code in the built-in terminal.", { x: 0.9, y: 2.25, w: 3.8, h: 0.9, fontSize: 11, fontFace: "Arial", color: "333333", margin: 0 });
+    s.addText("Download: code.visualstudio.com", { x: 0.9, y: 3.3, w: 3.8, h: 0.3, fontSize: 10, fontFace: "monospace", color: NAVY, margin: 0 });
+
+    // Cursor (alternative)
+    s.addShape(pres.shapes.RECTANGLE, { x: 5.1, y: 1.7, w: 4.3, h: 2.0, fill: { color: OFF_WHITE }, shadow: makeShadow() });
+    s.addShape(pres.shapes.RECTANGLE, { x: 5.1, y: 1.7, w: 4.3, h: 0.06, fill: { color: GOLD } });
+    s.addText("CURSOR (ALTERNATIVE)", { x: 5.4, y: 1.85, w: 3.8, h: 0.35, fontSize: 13, fontFace: "Arial", bold: true, color: NAVY, margin: 0 });
+    s.addText("VS Code fork with AI built-in.\nHas its own AI + can run Claude Code.\nGood if you want to try both.", { x: 5.4, y: 2.25, w: 3.8, h: 0.9, fontSize: 11, fontFace: "Arial", color: "333333", margin: 0 });
+    s.addText("Download: cursor.sh", { x: 5.4, y: 3.3, w: 3.8, h: 0.3, fontSize: 10, fontFace: "monospace", color: NAVY, margin: 0 });
+
+    // Workflow
+    s.addText("THE WORKFLOW:", { x: 0.8, y: 4.0, w: 8.4, h: 0.35, fontSize: 14, fontFace: "Arial", bold: true, color: NAVY, margin: 0 });
+    s.addText("1. Open the project in VS Code → File > Open Folder", { x: 0.8, y: 4.4, w: 8.4, h: 0.3, fontSize: 12, fontFace: "Arial", color: "333333", margin: 0 });
+    s.addText("2. Open integrated terminal → View > Terminal  (or Ctrl+`)", { x: 0.8, y: 4.7, w: 8.4, h: 0.3, fontSize: 12, fontFace: "Arial", color: "333333", margin: 0 });
+    s.addText("3. Run claude in the terminal → now you have AI help", { x: 0.8, y: 5.0, w: 8.4, h: 0.3, fontSize: 12, fontFace: "Arial", color: "333333", margin: 0 });
+  }
+
+  // Slide 5: Project Structure
   {
     const s = pres.addSlide();
     s.background = { color: WHITE };
