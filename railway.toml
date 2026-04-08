@@ -1,6 +1,9 @@
 [build]
 builder = "nixpacks"
 
+[build.nixpacks]
+aptPkgs = ["python3", "make", "g++"]
+
 [deploy]
 startCommand = "node server.js"
 healthcheckPath = "/"
