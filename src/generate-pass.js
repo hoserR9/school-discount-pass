@@ -12,7 +12,8 @@ const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
 const PASS_TYPE_ID = "pass.com.delnorte.football.discount";
 
 function generateCardId() {
-  return "DN-" + crypto.randomBytes(4).toString("hex").toUpperCase();
+  // 16-char hex after prefix = 64 bits of entropy (not enumerable)
+  return "DN-" + crypto.randomBytes(8).toString("hex").toUpperCase();
 }
 
 function generateAuthToken() {

@@ -11,8 +11,9 @@ const crypto = require("crypto");
 const { createSponsor, getAllSponsors } = require("./src/database");
 
 function generateCode() {
-  // 6-char alphanumeric, easy to type/share
-  return crypto.randomBytes(3).toString("hex").toUpperCase();
+  // 12-char alphanumeric code — 48 bits of entropy
+  // Brute-force resistant with rate limiting (10 attempts/min)
+  return crypto.randomBytes(6).toString("hex").toUpperCase();
 }
 
 const sponsors = [

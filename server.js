@@ -28,11 +28,102 @@ const {
 } = require("./src/database");
 const { pushUpdateToAll } = require("./src/push-update");
 
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// ═══════════════════════════════════════════════
+//  SECURITY MIDDLEWARE
+// ═══════════════════════════════════════════════
+
+// Security headers (XSS, clickjacking, MIME sniffing, etc.)
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:"],
+    },
+  },
+}));
+
+// HTTPS redirect in production
+if (process.env.NODE_ENV === "production" || process.env.RAILWAY_ENVIRONMENT) {
+  app.use((req, res, next) => {
+    if (req.headers["x-forwarded-proto"] !== "https") {
+      return res.redirect(301, `https://${req.headers.host}${req.url}`);
+    }
+    next();
+  });
+}
+
+// Global rate limiter — 100 requests per minute per IP
+const globalLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests, please try again later" },
+});
+app.use(globalLimiter);
+
+// Strict rate limiter for auth/sensitive endpoints — 10 requests per minute
+const authLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many attempts, please wait before trying again" },
+});
+
+// Admin authentication middleware
+// Set ADMIN_PASSWORD env var on Railway. Without it, admin is locked.
+function requireAdmin(req, res, next) {
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  // If no password is set, block admin access entirely in production
+  if (!adminPassword) {
+    if (process.env.NODE_ENV === "production" || process.env.RAILWAY_ENVIRONMENT) {
+      return res.status(403).json({ error: "Admin access not configured. Set ADMIN_PASSWORD env var." });
+    }
+    // Allow in local development
+    return next();
+  }
+
+  // Check Authorization header (Basic auth)
+  const authHeader = req.get("Authorization");
+  if (authHeader && authHeader.startsWith("Basic ")) {
+    const decoded = Buffer.from(authHeader.slice(6), "base64").toString();
+    const [user, pass] = decoded.split(":");
+    if (user === "admin" && pass === adminPassword) {
+      return next();
+    }
+  }
+
+  // Check query param (for browser access)
+  if (req.query.key === adminPassword) {
+    return next();
+  }
+
+  // Prompt for credentials
+  res.set("WWW-Authenticate", 'Basic realm="Nighthawk Admin"');
+  res.status(401).send("Authentication required");
+}
+
+// Input sanitization helper — strip HTML tags
+function sanitize(str) {
+  if (!str) return str;
+  return String(str).replace(/[<>&"']/g, (c) => {
+    const map = { "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" };
+    return map[c] || c;
+  }).substring(0, 200); // Max 200 chars
+}
+
 app.use(express.static(path.join(__dirname, "public")));
-app.use(express.json());
+app.use(express.json({ limit: "50kb" })); // Limit request body size
 
 // ═══════════════════════════════════════════════
 //  PASS GENERATION
@@ -40,7 +131,7 @@ app.use(express.json());
 
 app.get("/pass", async (req, res) => {
   try {
-    const holderName = req.query.name || null;
+    const holderName = req.query.name ? sanitize(req.query.name) : null;
     const { buffer, cardId } = await generatePass({ holderName });
 
     console.log(`[ISSUED] Card ${cardId} ${holderName ? `for ${holderName}` : ""}`);
@@ -52,7 +143,7 @@ app.get("/pass", async (req, res) => {
     res.send(buffer);
   } catch (err) {
     console.error("Error generating pass:", err);
-    res.status(500).json({ error: "Failed to generate pass", details: err.message });
+    res.status(500).json({ error: "Failed to generate pass" });
   }
 });
 
@@ -134,7 +225,7 @@ app.get("/card/:cardId", (req, res) => {
 // Claim endpoint — when user taps "Add to Wallet" from the claim page
 app.get("/card/:cardId/claim", async (req, res) => {
   const { cardId } = req.params;
-  const holderName = req.query.name || null;
+  const holderName = req.query.name ? sanitize(req.query.name) : null;
   const card = getCard.get(cardId);
 
   if (!card) {
@@ -345,7 +436,7 @@ app.post("/v1/log", (req, res) => {
 //  PROMOTIONS API
 // ═══════════════════════════════════════════════
 
-app.get("/api/promotions", (req, res) => {
+app.get("/api/promotions", requireAdmin, (req, res) => {
   const promotions = getAllPromotions.all();
   res.json(promotions);
 });
@@ -355,7 +446,7 @@ app.get("/api/promotions/active", (req, res) => {
   res.json(promotions);
 });
 
-app.post("/api/promotions", (req, res) => {
+app.post("/api/promotions", requireAdmin, (req, res) => {
   const { title, message, fieldKey, fieldValue, activeFrom, activeUntil } = req.body;
 
   if (!title || !message) {
@@ -376,7 +467,7 @@ app.post("/api/promotions", (req, res) => {
   res.json({ success: true, id: Number(result.lastInsertRowid) });
 });
 
-app.post("/api/promotions/:id/deactivate", (req, res) => {
+app.post("/api/promotions/:id/deactivate", requireAdmin, (req, res) => {
   deactivatePromotion.run(req.params.id);
   console.log(`[PROMO] Deactivated promotion #${req.params.id}`);
   res.json({ success: true });
@@ -388,7 +479,7 @@ app.post("/api/promotions/:id/deactivate", (req, res) => {
  * This tells every iPhone with the card to fetch the latest version,
  * which will include any active promotions.
  */
-app.post("/api/push", async (req, res) => {
+app.post("/api/push", requireAdmin, async (req, res) => {
   console.log("[PUSH] Triggering push update to all registered devices...");
 
   // Touch all cards' last_updated timestamp
@@ -410,7 +501,7 @@ app.post("/api/push", async (req, res) => {
 //  ADMIN DASHBOARD & API
 // ═══════════════════════════════════════════════
 
-app.get("/admin", (req, res) => {
+app.get("/admin", requireAdmin, (req, res) => {
   res.sendFile(path.join(__dirname, "public", "admin.html"));
 });
 
@@ -418,7 +509,7 @@ app.get("/terms", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "terms.html"));
 });
 
-app.get("/api/cards", (req, res) => {
+app.get("/api/cards", requireAdmin, (req, res) => {
   const cards = getAllCards.all();
   res.json(cards);
 });
@@ -428,7 +519,7 @@ app.get("/api/cards/:cardId/scans", (req, res) => {
   res.json(scans);
 });
 
-app.get("/api/stats", (req, res) => {
+app.get("/api/stats", requireAdmin, (req, res) => {
   const stats = getUsageStats.all();
   const cards = getAllCards.all();
   const regCount = getRegistrationCount.get();
@@ -444,7 +535,7 @@ app.get("/api/stats", (req, res) => {
   });
 });
 
-app.post("/api/cards/:cardId/deactivate", (req, res) => {
+app.post("/api/cards/:cardId/deactivate", requireAdmin, (req, res) => {
   deactivateCard.run(req.params.cardId);
   res.json({ success: true });
 });
@@ -530,7 +621,7 @@ function renderScanPage(card, cardId, scans = []) {
       <div class="status">${statusEmoji}</div>
       <h1>DEL NORTE NIGHTHAWK</h1>
       <h2>Discount Card — ${statusText}</h2>
-      ${card.holder_name ? `<div class="holder-name">${card.holder_name}</div>` : ''}
+      ${card.holder_name ? `<div class="holder-name">${sanitize(card.holder_name)}</div>` : ''}
       ${warningHtml}
       <div class="detail"><span class="label">Card ID</span><span>${cardId}</span></div>
       ${!card.holder_name ? '<div class="detail"><span class="label">Holder</span><span>General</span></div>' : ''}
@@ -632,7 +723,7 @@ const { upsertPosConfig, getAllPosConfigs, getPosConfigForScan } = (() => {
 })();
 const { validateForPOS, getSupportedPOSTypes } = require("./src/integrations");
 
-app.get("/api/pos-config", (req, res) => {
+app.get("/api/pos-config", requireAdmin, (req, res) => {
   const configs = getAllPosConfigs.all();
   // Parse config_json for each
   const parsed = configs.map(c => ({
@@ -646,7 +737,7 @@ app.get("/api/pos-types", (req, res) => {
   res.json(getSupportedPOSTypes());
 });
 
-app.post("/api/pos-config", (req, res) => {
+app.post("/api/pos-config", requireAdmin, (req, res) => {
   const { businessName, posType, config } = req.body;
   if (!businessName || !posType) {
     return res.status(400).json({ error: "businessName and posType required" });
@@ -671,7 +762,7 @@ app.get("/sponsor", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "sponsor.html"));
 });
 
-app.post("/api/sponsor/login", (req, res) => {
+app.post("/api/sponsor/login", authLimiter, (req, res) => {
   const { code } = req.body;
   if (!code) return res.status(400).json({ error: "Access code required" });
 
